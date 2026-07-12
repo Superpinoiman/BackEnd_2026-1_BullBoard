@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 페이지 | BullBoard</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/overrides.css">
+    <link rel="stylesheet" href="/css/mypage.css">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="/"><span class="brand-mark">B</span> BullBoard</a>
+    <nav><a href="/">시장</a><a href="/mypage" aria-current="page">내 페이지</a><a href="/posts">커뮤니티</a></nav>
+    <button class="text-button" id="logoutButton" hidden>로그아웃</button>
+</header>
+
+<main class="mypage-shell">
+    <section class="mypage-card" id="loadingState">
+        <p>회원 정보를 확인하고 있습니다…</p>
+    </section>
+
+    <section class="mypage-card" id="loginRequired" hidden>
+        <p class="eyebrow">MY PAGE</p>
+        <h1>로그인이 필요합니다.</h1>
+        <p class="mypage-description">내 페이지는 로그인한 회원만 이용할 수 있습니다.</p>
+        <a class="primary-button mypage-link" href="/">홈에서 로그인하기</a>
+    </section>
+
+    <section class="mypage-card" id="profileSection" hidden>
+        <p class="eyebrow">MY PAGE</p>
+        <h1><span id="welcomeNickname"></span>님의 회원 정보</h1>
+        <p class="mypage-description">이메일, 닉네임과 비밀번호를 변경할 수 있습니다.</p>
+        <form id="profileForm">
+            <label>이메일<input type="email" id="email" name="email" required autocomplete="email"></label>
+            <label>새 비밀번호<input type="password" name="password" required autocomplete="new-password" placeholder="영문·숫자·특수문자 포함 8자 이상"></label>
+            <label>새 비밀번호 확인<input type="password" name="passwordConfirm" required autocomplete="new-password" placeholder="비밀번호를 다시 입력하세요"></label>
+            <label>닉네임<input type="text" id="nickname" name="nickname" required></label>
+            <button class="primary-button" type="submit">회원 정보 저장</button>
+        </form>
+    </section>
+</main>
+<div class="toast" id="toast"></div>
+<script src="/js/mypage.js"></script>
+</body>
+</html>

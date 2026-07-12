@@ -7,11 +7,13 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/overrides.css">
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-single-ticker.js"></script>
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-mini-chart.js"></script>
 </head>
 <body>
 <header class="topbar">
     <a class="brand" href="/"><span class="brand-mark">B</span> BullBoard</a>
-    <nav><a href="#markets">시장</a><a href="#stocks">종목</a><a href="/posts">커뮤니티</a></nav>
+    <nav><a href="#markets">시장</a><a href="/mypage">내 페이지</a><a href="/posts">커뮤니티</a></nav>
     <div class="auth-actions" id="authActions">
         <button class="text-button" data-open="login">로그인</button>
         <button class="primary-button small" data-open="signup">회원가입</button>
@@ -31,25 +33,40 @@
             <p class="notice">BullBoard는 투자 조언을 제공하지 않습니다.</p>
         </div>
         <div class="hero-panel">
-            <div class="panel-head"><span>오늘의 시장</span><span class="live-dot">LIVE</span></div>
-            <div class="chart"><span class="chart-label top">+2.48%</span><svg viewBox="0 0 500 200" preserveAspectRatio="none"><path d="M0,160 C30,150 45,170 70,125 S110,145 135,95 S170,115 195,72 S240,110 270,68 S310,85 340,46 S385,77 420,34 S465,50 500,12" fill="none" stroke="currentColor" stroke-width="4"/></svg><span class="chart-label bottom">NASDAQ 100</span></div>
-            <div class="panel-stat"><div><span>지수</span><strong>21,421.76</strong></div><b>▲ 521.34</b></div>
+            <div class="panel-head"><span>오늘의 나스닥 시장</span><span class="live-dot">LIVE</span></div>
+            <div class="nasdaq-live-chart"><tv-mini-chart symbol="FOREXCOM:NSXUSD" theme="dark" transparent><span class="ticker-placeholder">나스닥 100 차트 불러오는 중…</span></tv-mini-chart></div>
         </div>
     </section>
 
     <section class="market-strip" id="markets">
-        <article><span>S&amp;P 500</span><strong>6,173.07</strong><b class="up">+0.74%</b></article>
-        <article><span>NASDAQ</span><strong>20,173.89</strong><b class="up">+1.02%</b></article>
-        <article><span>DOW</span><strong>44,828.53</strong><b class="down">-0.12%</b></article>
-        <article><span>VIX</span><strong>17.49</strong><b class="down">-3.42%</b></article>
+        <article><tv-single-ticker symbol="FOREXCOM:SPXUSD"><span class="ticker-placeholder">S&amp;P 500 불러오는 중…</span></tv-single-ticker></article>
+        <article><tv-single-ticker symbol="FOREXCOM:NSXUSD"><span class="ticker-placeholder">NASDAQ 100 불러오는 중…</span></tv-single-ticker></article>
+        <article><tv-single-ticker symbol="FOREXCOM:DJI"><span class="ticker-placeholder">DOW 불러오는 중…</span></tv-single-ticker></article>
+        <article><tv-single-ticker symbol="CAPITALCOM:VIX"><span class="ticker-placeholder">VIX 불러오는 중…</span></tv-single-ticker></article>
     </section>
 
     <section class="content-section" id="stocks">
-        <div class="section-title"><div><p class="eyebrow">STOCK PULSE</p><h2>지금 주목받는 종목</h2></div><a href="#">전체 종목 보기 →</a></div>
-        <div class="stock-grid">
-            <article class="stock-card"><div class="ticker-logo apple">A</div><div><span>AAPL</span><h3>Apple</h3></div><div class="price"><strong>$212.49</strong><b class="up">+1.86%</b></div></article>
-            <article class="stock-card"><div class="ticker-logo nvda">N</div><div><span>NVDA</span><h3>NVIDIA</h3></div><div class="price"><strong>$157.25</strong><b class="up">+3.21%</b></div></article>
-            <article class="stock-card"><div class="ticker-logo tesla">T</div><div><span>TSLA</span><h3>Tesla</h3></div><div class="price"><strong>$315.35</strong><b class="down">-0.97%</b></div></article>
+        <div class="section-title"><div><p class="eyebrow">MOST ACTIVE</p><h2>미국 시장 거래량 상위 종목</h2></div></div>
+        <div class="market-hotlist">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/markets/stocks-usa/" rel="noopener nofollow" target="_blank"><span>미국 주식 시장</span></a> by TradingView</div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js" async>
+                {
+                    "colorTheme": "light",
+                    "dateRange": "1D",
+                    "exchange": "US",
+                    "showChart": false,
+                    "locale": "kr",
+                    "width": "100%",
+                    "height": "500",
+                    "largeChartUrl": "",
+                    "isTransparent": true,
+                    "showSymbolLogo": true,
+                    "showFloatingTooltip": true
+                }
+                </script>
+            </div>
         </div>
     </section>
 

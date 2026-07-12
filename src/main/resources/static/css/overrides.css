@@ -11,3 +11,78 @@
 .hero-actions {
     display: none;
 }
+.live-ticker {
+    flex: 1;
+    min-width: 150px;
+    height: 58px;
+    margin-left: auto;
+    overflow: hidden;
+}
+
+.live-ticker tv-single-ticker {
+    display: block;
+    width: 100%;
+    height: 58px;
+}
+
+.ticker-placeholder {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 58px;
+    text-align: right;
+}
+
+.hero-panel {
+    padding: 18px;
+}
+
+.nasdaq-live-chart {
+    width: 100%;
+    height: 330px;
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+.nasdaq-live-chart tv-mini-chart {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.market-strip article {
+    height: 104px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.market-strip tv-single-ticker {
+    display: block;
+    width: 100%;
+    height: 82px;
+}
+
+.market-hotlist {
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.market-hotlist .tradingview-widget-container,
+.market-hotlist .tradingview-widget-container__widget {
+    width: 100%;
+    height: 100%;
+}
+
+.tradingview-widget-copyright {
+    padding: 3px 10px;
+    color: var(--muted);
+    font-size: 11px;
+    text-align: right;
+}
+
+.tradingview-widget-copyright a {
+    color: var(--green);
+}
