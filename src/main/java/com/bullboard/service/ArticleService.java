@@ -46,36 +46,33 @@ public class ArticleService {
 
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND));
+
         return new ArticleResponse(article, loginMemberId);
     }
 
-    public ArticlePageResponse getArticles(Long boardId, String keyword, String sort,
+    public ArticlePageResponse getArticles(Long boardId, String keyword, String symbol,
+                                           String sort,
                                            int page, int size,
                                            Long loginMemberId) {
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), 100);
         String safeKeyword = normalizeKeyword(keyword);
+        String safeSymbol = normalizeSymbol(symbol);
         Sort pageSort = "views".equalsIgnoreCase(sort)
                 ? Sort.by(Sort.Order.desc("viewCount"), Sort.Order.desc("id"))
                 : Sort.by(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(safePage, safeSize, pageSort);
-        Page<Article> articles;
 
-        if (boardId == null) {
-            articles = safeKeyword.isBlank()
-                    ? articleRepository.findAll(pageable)
-                    : articleRepository.searchAll(safeKeyword, pageable);
-        } else {
-            if (!boardRepository.existsById(boardId)) {
-                throw new ApiException(HttpStatus.NOT_FOUND);
-            }
-            articles = safeKeyword.isBlank()
-                    ? articleRepository.findByBoardId(boardId, pageable)
-                    : articleRepository.searchByBoardId(boardId, safeKeyword, pageable);
+        if (boardId != null && !boardRepository.existsById(boardId)) {
+            throw new ApiException(HttpStatus.NOT_FOUND);
         }
+
+        Page<Article> articles = articleRepository.search(
+                boardId, safeKeyword, safeSymbol, pageable);
 
         Page<ArticleResponse> responsePage = articles
                 .map(article -> new ArticleResponse(article, loginMemberId));
+
         return new ArticlePageResponse(responsePage);
     }
 
@@ -84,7 +81,21 @@ public class ArticleService {
             return "";
         }
         String normalized = keyword.trim();
+
         return normalized.length() > 100 ? normalized.substring(0, 100) : normalized;
+    }
+
+    private String normalizeSymbol(String symbol) {
+        if (symbol == null || symbol.isBlank()) {
+            return "";
+        }
+        String normalized = symbol.trim().toUpperCase();
+
+        if (!normalized.matches("^[A-Z][A-Z0-9.-]{0,9}$")) {
+            throw new ApiException(HttpStatus.BAD_REQUEST);
+        }
+
+        return normalized;
     }
 
     @Transactional
@@ -94,8 +105,10 @@ public class ArticleService {
         Board board = boardRepository.findById(request.getBoardId())
                 .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST));
 
-        Article article = new Article(board, member, request.getTitle(), request.getContent());
+        Article article = new Article(board, member, normalizeSymbol(request.getSymbol()),
+                request.getTitle(), request.getContent());
         articleRepository.save(article);
+
         return new ArticleResponse(article, memberId);
     }
 
@@ -109,7 +122,8 @@ public class ArticleService {
         Board board = boardRepository.findById(request.getBoardId())
                 .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST));
 
-        article.update(board, request.getTitle(), request.getContent());
+        article.update(board, normalizeSymbol(request.getSymbol()),
+                request.getTitle(), request.getContent());
         return new ArticleResponse(article, memberId);
     }
 

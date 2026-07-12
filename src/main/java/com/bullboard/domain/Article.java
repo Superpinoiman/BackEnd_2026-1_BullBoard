@@ -29,6 +29,7 @@ public class Article {
 
     private String title;
     private String content;
+    private String symbol;
 
     @Column(nullable = false)
     private long viewCount;
@@ -49,9 +50,10 @@ public class Article {
     }
 
     public Article(Board board, Member member,
-                   String title, String content) {
+                   String symbol, String title, String content) {
         this.board = board;
         this.member = member;
+        this.symbol = symbol;
         this.title = title;
         this.content = content;
         this.viewCount = 0L;
@@ -59,8 +61,9 @@ public class Article {
         this.modifiedDate = LocalDateTime.now();
     }
 
-    public void update(Board board, String title, String content) {
+    public void update(Board board, String symbol, String title, String content) {
         this.board = board;
+        this.symbol = symbol;
         this.title = title;
         this.content = content;
         this.modifiedDate = LocalDateTime.now();
@@ -90,6 +93,10 @@ public class Article {
 
     public String getContent() {
         return content;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 
     public long getViewCount() {

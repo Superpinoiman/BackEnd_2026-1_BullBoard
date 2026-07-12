@@ -35,6 +35,21 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             """)
     Page<Article> searchAll(@Param("keyword") String keyword, Pageable pageable);
 
+    @Query("""
+            select a from Article a
+            where (:boardId is null or a.board.id = :boardId)
+              and (
+                  :keyword = ''
+                  or lower(a.title) like lower(concat('%', :keyword, '%'))
+                  or lower(a.content) like lower(concat('%', :keyword, '%'))
+              )
+              and (:symbol = '' or upper(a.symbol) = :symbol)
+            """)
+    Page<Article> search(@Param("boardId") Long boardId,
+                         @Param("keyword") String keyword,
+                         @Param("symbol") String symbol,
+                         Pageable pageable);
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Article a set a.viewCount = a.viewCount + 1 where a.id = :id")
     int increaseViewCount(@Param("id") Long id);

@@ -13,6 +13,7 @@ public class ArticleResponse {
     private final String authorNickname;
     private final String title;
     private final String content;
+    private final String symbol;
     private final long viewCount;
     private final LocalDateTime createdDate;
     private final LocalDateTime modifiedDate;
@@ -27,6 +28,7 @@ public class ArticleResponse {
                 ? "알 수 없음" : article.getAuthor().getNickname();
         this.title = article.getTitle();
         this.content = article.getContent();
+        this.symbol = article.getSymbol();
         this.viewCount = article.getViewCount();
         this.createdDate = article.getCreatedDate();
         this.modifiedDate = article.getModifiedDate();
@@ -41,6 +43,7 @@ public class ArticleResponse {
     public String getAuthorNickname() { return authorNickname; }
     public String getTitle() { return title; }
     public String getContent() { return content; }
+    public String getSymbol() { return symbol; }
     public long getViewCount() { return viewCount; }
     public LocalDateTime getCreatedDate() { return createdDate; }
     public LocalDateTime getModifiedDate() { return modifiedDate; }

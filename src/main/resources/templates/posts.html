@@ -30,11 +30,13 @@
         .search-form { display:flex; gap:8px; padding:18px 0 4px; }
         .search-form input { flex:1; min-width:0; padding:11px 13px; border:1px solid var(--line); border-radius:8px; }
         .search-form select { padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+        .search-form .symbol-filter { flex:0 0 105px; text-transform:uppercase; }
         .search-form button { padding:10px 16px; border:1px solid var(--line); border-radius:8px; background:#fff; font-weight:800; }
         .article-list { display:grid; }
         .article-row { display:grid; grid-template-columns:1fr auto; gap:18px; width:100%; padding:19px 4px; border:0; border-bottom:1px solid var(--line); background:transparent; text-align:left; }
         .article-row:hover { color:#087d56; }
         .article-title { display:block; margin-bottom:7px; font-size:16px; font-weight:800; }
+        .symbol-tag { display:inline-block; margin-right:7px; padding:3px 7px; border-radius:999px; background:#e1f5eb; color:#087d56; font-size:11px; font-weight:800; }
         .article-meta,.article-date { color:var(--muted); font-size:12px; }
         .empty { padding:90px 20px; color:var(--muted); text-align:center; }
         .pagination { display:flex; justify-content:center; gap:6px; padding-top:24px; }
@@ -91,6 +93,7 @@
             <button class="primary" id="writeButton">글쓰기</button>
         </div>
         <form class="search-form" id="searchForm">
+            <input class="symbol-filter" id="symbolFilter" maxlength="10" placeholder="종목 심볼" aria-label="종목 심볼 필터">
             <input id="searchInput" type="search" maxlength="100" placeholder="제목 또는 내용 검색" aria-label="게시글 검색">
             <select id="sortSelect" aria-label="게시글 정렬">
                 <option value="latest">최신순</option>
@@ -127,6 +130,7 @@
         <button class="close" type="button" data-close="editorOverlay">×</button>
         <h2 id="editorTitle">게시글 작성</h2>
         <label>게시판<select id="editorBoard" required></select></label>
+        <label>종목 심볼 (선택)<input id="editorSymbol" maxlength="10" placeholder="예: NVDA, AAPL"></label>
         <label>제목<input id="editorArticleTitle" maxlength="200" required placeholder="제목을 입력하세요"></label>
         <label>내용<textarea id="editorContent" required placeholder="내용을 입력하세요"></textarea></label>
         <div class="editor-actions">
@@ -139,7 +143,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    const state={boards:[],articles:[],comments:[],selectedBoardId:null,keyword:'',sort:'latest',pageInfo:null,editingId:null,currentArticle:null};
+    const state={boards:[],articles:[],comments:[],selectedBoardId:null,keyword:'',symbol:'',sort:'latest',pageInfo:null,editingId:null,currentArticle:null};
     const boardList=document.getElementById('boardList'),articleList=document.getElementById('articleList'),toast=document.getElementById('toast');
     const showToast=message=>{toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)};
     const formatDate=value=>new Intl.DateTimeFormat('ko-KR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));
@@ -172,29 +176,30 @@
             button.addEventListener('click',()=>changeBoard(board.id));boardList.append(button);
             const option=document.createElement('option');option.value=board.id;option.textContent=board.name;select.append(option);
         });
-        const query=new URLSearchParams(location.search),queryBoard=Number(query.get('boardId')),queryPage=Math.max(Number(query.get('page'))||0,0),queryKeyword=(query.get('keyword')||'').slice(0,100),querySort=query.get('sort')==='views'?'views':'latest';
-        state.keyword=queryKeyword;state.sort=querySort;document.getElementById('searchInput').value=queryKeyword;document.getElementById('sortSelect').value=querySort;
-        await selectBoard(state.boards.some(board=>board.id===queryBoard)?queryBoard:state.boards[0].id,queryPage,queryKeyword);
+        const query=new URLSearchParams(location.search),queryBoard=Number(query.get('boardId')),queryPage=Math.max(Number(query.get('page'))||0,0),queryKeyword=(query.get('keyword')||'').slice(0,100),querySymbol=(query.get('symbol')||'').slice(0,10).toUpperCase(),querySort=query.get('sort')==='views'?'views':'latest';
+        state.keyword=queryKeyword;state.symbol=querySymbol;state.sort=querySort;document.getElementById('searchInput').value=queryKeyword;document.getElementById('symbolFilter').value=querySymbol;document.getElementById('sortSelect').value=querySort;
+        await selectBoard(state.boards.some(board=>board.id===queryBoard)?queryBoard:state.boards[0].id,queryPage,queryKeyword,querySymbol);
     }
 
-    function changeBoard(boardId){state.keyword='';document.getElementById('searchInput').value='';return selectBoard(boardId,0,'')}
+    function changeBoard(boardId){state.keyword='';state.symbol='';document.getElementById('searchInput').value='';document.getElementById('symbolFilter').value='';return selectBoard(boardId,0,'','')}
 
-    async function selectBoard(boardId,page=0,keyword=state.keyword){
+    async function selectBoard(boardId,page=0,keyword=state.keyword,symbol=state.symbol){
         state.selectedBoardId=boardId;
         state.keyword=(keyword||'').trim().slice(0,100);
+        state.symbol=(symbol||'').trim().slice(0,10).toUpperCase();
         const board=state.boards.find(item=>item.id===boardId);
         document.getElementById('boardTitle').textContent=board.name;
         document.querySelectorAll('.board-button').forEach((button,index)=>button.classList.toggle('active',state.boards[index].id===boardId));
-        const keywordQuery=state.keyword?`&keyword=${encodeURIComponent(state.keyword)}`:'',sortQuery=`&sort=${state.sort}`;
-        const pageResponse=await api(`/articles?boardId=${boardId}${keywordQuery}${sortQuery}&page=${Math.max(page,0)}&size=20`);
-        if(!pageResponse.content.length&&page>0&&pageResponse.total_pages>0){return selectBoard(boardId,pageResponse.total_pages-1,state.keyword)}
+        const keywordQuery=state.keyword?`&keyword=${encodeURIComponent(state.keyword)}`:'',symbolQuery=state.symbol?`&symbol=${encodeURIComponent(state.symbol)}`:'',sortQuery=`&sort=${state.sort}`;
+        const pageResponse=await api(`/articles?boardId=${boardId}${keywordQuery}${symbolQuery}${sortQuery}&page=${Math.max(page,0)}&size=20`);
+        if(!pageResponse.content.length&&page>0&&pageResponse.total_pages>0){return selectBoard(boardId,pageResponse.total_pages-1,state.keyword,state.symbol)}
         state.pageInfo=pageResponse;state.articles=pageResponse.content;
-        history.replaceState(null,'',`/posts?boardId=${boardId}&page=${pageResponse.page}${keywordQuery}${sortQuery}`);
+        history.replaceState(null,'',`/posts?boardId=${boardId}&page=${pageResponse.page}${keywordQuery}${symbolQuery}${sortQuery}`);
         renderArticles();renderPagination();
     }
 
-    document.getElementById('searchForm').addEventListener('submit',event=>{event.preventDefault();selectBoard(state.selectedBoardId,0,document.getElementById('searchInput').value)});
-    document.getElementById('sortSelect').addEventListener('change',event=>{state.sort=event.target.value;selectBoard(state.selectedBoardId,0,state.keyword)});
+    document.getElementById('searchForm').addEventListener('submit',event=>{event.preventDefault();selectBoard(state.selectedBoardId,0,document.getElementById('searchInput').value,document.getElementById('symbolFilter').value)});
+    document.getElementById('sortSelect').addEventListener('change',event=>{state.sort=event.target.value;selectBoard(state.selectedBoardId,0,state.keyword,state.symbol)});
 
     function renderArticles(){
         articleList.replaceChildren();
@@ -202,7 +207,7 @@
         state.articles.forEach(article=>{
             const button=document.createElement('button');button.className='article-row';
             const summary=document.createElement('span');
-            const title=document.createElement('span');title.className='article-title';title.textContent=article.title;
+            const title=document.createElement('span');title.className='article-title';if(article.symbol){const symbol=document.createElement('span');symbol.className='symbol-tag';symbol.textContent=article.symbol;title.append(symbol)}title.append(document.createTextNode(article.title));
             const meta=document.createElement('span');meta.className='article-meta';meta.textContent=`${article.author_nickname} · 조회 ${article.view_count}`;
             const date=document.createElement('span');date.className='article-date';date.textContent=formatDate(article.created_date);
             summary.append(title,meta);button.append(summary,date);button.addEventListener('click',()=>showDetail(article.id));articleList.append(button);
@@ -221,7 +226,7 @@
 
     async function showDetail(id){
         const article=await api(`/articles/${id}`);state.currentArticle=article;
-        document.getElementById('detailBoard').textContent=article.board_name;
+        document.getElementById('detailBoard').textContent=article.symbol?`${article.board_name} · ${article.symbol}`:article.board_name;
         document.getElementById('detailTitle').textContent=article.title;
         document.getElementById('detailMeta').textContent=`${article.author_nickname} · 조회 ${article.view_count} · ${formatDate(article.created_date)}`;
         document.getElementById('detailContent').textContent=article.content;
@@ -283,6 +288,7 @@
         state.editingId=article?.id||null;
         document.getElementById('editorTitle').textContent=article?'게시글 수정':'게시글 작성';
         document.getElementById('editorBoard').value=article?.board_id||state.selectedBoardId;
+        document.getElementById('editorSymbol').value=article?.symbol||'';
         document.getElementById('editorArticleTitle').value=article?.title||'';
         document.getElementById('editorContent').value=article?.content||'';
         close('detailOverlay');open('editorOverlay');
@@ -291,7 +297,7 @@
     document.getElementById('writeButton').addEventListener('click',()=>openEditor());
     document.getElementById('editorForm').addEventListener('submit',async event=>{
         event.preventDefault();
-        const body=JSON.stringify({board_id:Number(document.getElementById('editorBoard').value),title:document.getElementById('editorArticleTitle').value.trim(),content:document.getElementById('editorContent').value.trim()});
+        const body=JSON.stringify({board_id:Number(document.getElementById('editorBoard').value),symbol:document.getElementById('editorSymbol').value.trim().toUpperCase(),title:document.getElementById('editorArticleTitle').value.trim(),content:document.getElementById('editorContent').value.trim()});
         try{
             const article=await api(state.editingId?`/articles/${state.editingId}`:'/articles',{method:state.editingId?'PUT':'POST',body});
             close('editorOverlay');showToast(state.editingId?'게시글이 수정되었습니다.':'게시글이 작성되었습니다.');

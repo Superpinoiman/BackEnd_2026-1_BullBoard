@@ -52,12 +52,13 @@ public class ArticleController {
     public ResponseEntity<ArticlePageResponse> getArticles(
             @RequestParam(required = false) Long boardId,
             @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "") String symbol,
             @RequestParam(defaultValue = "latest") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             HttpServletRequest servletRequest) {
         return ResponseEntity.ok(articleService.getArticles(
-                boardId, keyword, sort, page, size,
+                boardId, keyword, symbol, sort, page, size,
                 sessionMemberResolver.getMemberId(servletRequest)));
     }
 
@@ -67,6 +68,7 @@ public class ArticleController {
             @Valid @RequestBody ArticleUpdateRequest request,
             HttpServletRequest servletRequest) {
         Long memberId = sessionMemberResolver.requireMemberId(servletRequest);
+
         return ResponseEntity.ok(articleService.updateArticle(id, request, memberId));
     }
 
@@ -75,6 +77,7 @@ public class ArticleController {
                                               HttpServletRequest servletRequest) {
         Long memberId = sessionMemberResolver.requireMemberId(servletRequest);
         articleService.deleteArticle(id, memberId);
+
         return ResponseEntity.noContent().build();
     }
 }
