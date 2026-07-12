@@ -22,14 +22,16 @@ public class ArticleResponse {
         this.id = article.getId();
         this.boardId = article.getBoard().getId();
         this.boardName = article.getBoard().getName();
-        this.authorId = article.getAuthor().getId();
-        this.authorNickname = article.getAuthor().getNickname();
+        this.authorId = article.getAuthor() == null ? null : article.getAuthor().getId();
+        this.authorNickname = article.getAuthor() == null
+                ? "알 수 없음" : article.getAuthor().getNickname();
         this.title = article.getTitle();
         this.content = article.getContent();
         this.viewCount = article.getViewCount();
         this.createdDate = article.getCreatedDate();
         this.modifiedDate = article.getModifiedDate();
-        this.editable = loginMemberId != null && loginMemberId.equals(authorId);
+        this.editable = authorId != null && loginMemberId != null
+                && loginMemberId.equals(authorId);
     }
 
     public Long getId() { return id; }

@@ -49,6 +49,17 @@
         .detail-meta { padding-bottom:18px; border-bottom:1px solid var(--line); color:var(--muted); font-size:13px; }
         .detail-content { min-height:190px; padding:24px 0; line-height:1.75; white-space:pre-wrap; }
         .detail-actions { display:flex; justify-content:flex-end; gap:8px; }
+        .comments { margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
+        .comments h3 { margin:0 0 15px; font-size:16px; }
+        .comment-list { display:grid; gap:10px; }
+        .comment { padding:13px; border-radius:9px; background:var(--paper); }
+        .comment-head { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:12px; }
+        .comment-content { margin:9px 0 0; line-height:1.55; white-space:pre-wrap; }
+        .comment-actions { display:flex; justify-content:flex-end; gap:6px; margin-top:8px; }
+        .comment-actions button { border:0; background:transparent; color:var(--muted); font-size:12px; font-weight:700; }
+        .comment-edit { width:100%; min-height:76px; margin-top:9px; padding:10px; border:1px solid var(--green); border-radius:8px; resize:vertical; }
+        .comment-form { display:flex; gap:8px; margin-top:14px; }
+        .comment-form textarea { flex:1; min-height:66px; resize:vertical; padding:11px; border:1px solid var(--line); border-radius:8px; }
         .secondary,.danger { padding:9px 14px; border:1px solid var(--line); border-radius:7px; background:#fff; font-weight:700; }
         .danger { border-color:#f1c3c2; color:var(--red); }
         .editor { display:grid; gap:16px; }
@@ -100,6 +111,14 @@
         <div class="detail-meta" id="detailMeta"></div>
         <div class="detail-content" id="detailContent"></div>
         <div class="detail-actions" id="detailActions"></div>
+        <section class="comments">
+            <h3>댓글 <span id="commentCount">0</span></h3>
+            <div class="comment-list" id="commentList"></div>
+            <form class="comment-form" id="commentForm">
+                <textarea id="commentInput" maxlength="1000" required placeholder="댓글을 입력하세요"></textarea>
+                <button class="primary" type="submit">등록</button>
+            </form>
+        </section>
     </article>
 </div>
 
@@ -120,7 +139,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    const state={boards:[],articles:[],selectedBoardId:null,keyword:'',sort:'latest',pageInfo:null,editingId:null,currentArticle:null};
+    const state={boards:[],articles:[],comments:[],selectedBoardId:null,keyword:'',sort:'latest',pageInfo:null,editingId:null,currentArticle:null};
     const boardList=document.getElementById('boardList'),articleList=document.getElementById('articleList'),toast=document.getElementById('toast');
     const showToast=message=>{toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)};
     const formatDate=value=>new Intl.DateTimeFormat('ko-KR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));
@@ -207,12 +226,57 @@
         document.getElementById('detailMeta').textContent=`${article.author_nickname} · 조회 ${article.view_count} · ${formatDate(article.created_date)}`;
         document.getElementById('detailContent').textContent=article.content;
         const actions=document.getElementById('detailActions');actions.replaceChildren();
+        const likeState=await api(`/articles/${article.id}/likes`);renderLikeAction(actions,article.id,likeState);
         if(article.editable){
             const edit=document.createElement('button');edit.className='secondary';edit.textContent='수정';edit.addEventListener('click',()=>openEditor(article));
             const remove=document.createElement('button');remove.className='danger';remove.textContent='삭제';remove.addEventListener('click',deleteCurrentArticle);
             actions.append(edit,remove);
         }
+        await loadComments(article.id);
         open('detailOverlay');
+    }
+
+    async function loadComments(articleId){
+        state.comments=await api(`/articles/${articleId}/comments`);
+        document.getElementById('commentCount').textContent=state.comments.length;
+        const list=document.getElementById('commentList');list.replaceChildren();
+        if(!state.comments.length){list.innerHTML='<div class="article-meta">첫 댓글을 작성해 보세요.</div>';return}
+        state.comments.forEach(comment=>{
+            const item=document.createElement('article');item.className='comment';
+            const head=document.createElement('div');head.className='comment-head';
+            const author=document.createElement('strong');author.textContent=comment.author_nickname;
+            const date=document.createElement('span');date.textContent=formatDate(comment.created_date);head.append(author,date);
+            const content=document.createElement('p');content.className='comment-content';content.textContent=comment.content;
+            item.append(head,content);
+            if(comment.editable){const actions=document.createElement('div');actions.className='comment-actions';const edit=document.createElement('button');edit.textContent='수정';edit.addEventListener('click',()=>startCommentEdit(comment,item));const remove=document.createElement('button');remove.textContent='삭제';remove.addEventListener('click',()=>deleteComment(comment.id));actions.append(edit,remove);item.append(actions)}
+            list.append(item);
+        });
+    }
+
+    document.getElementById('commentForm').addEventListener('submit',async event=>{
+        event.preventDefault();if(!state.currentArticle)return;
+        const input=document.getElementById('commentInput'),content=input.value.trim();if(!content)return;
+        try{await api(`/articles/${state.currentArticle.id}/comments`,{method:'POST',body:JSON.stringify({content})});input.value='';showToast('댓글이 등록되었습니다.');await loadComments(state.currentArticle.id)}catch(error){showToast(error.message)}
+    });
+
+    function startCommentEdit(comment,item){
+        const current=item.querySelector('.comment-content'),oldActions=item.querySelector('.comment-actions');
+        const textarea=document.createElement('textarea');textarea.className='comment-edit';textarea.maxLength=1000;textarea.value=comment.content;
+        const actions=document.createElement('div');actions.className='comment-actions';
+        const cancel=document.createElement('button');cancel.type='button';cancel.textContent='취소';cancel.addEventListener('click',()=>loadComments(state.currentArticle.id));
+        const save=document.createElement('button');save.type='button';save.textContent='저장';save.addEventListener('click',async()=>{const content=textarea.value.trim();if(!content){showToast('댓글 내용을 입력해 주세요.');return}try{await api(`/comments/${comment.id}`,{method:'PUT',body:JSON.stringify({content})});showToast('댓글이 수정되었습니다.');await loadComments(state.currentArticle.id)}catch(error){showToast(error.message)}});
+        current.replaceWith(textarea);oldActions.replaceWith(actions);actions.append(cancel,save);textarea.focus();
+    }
+
+    async function deleteComment(id){
+        if(!confirm('댓글을 삭제하시겠습니까?'))return;
+        try{await api(`/comments/${id}`,{method:'DELETE'});showToast('댓글이 삭제되었습니다.');await loadComments(state.currentArticle.id)}catch(error){showToast(error.message)}
+    }
+
+    function renderLikeAction(container,articleId,likeState){
+        const button=document.createElement('button');button.className='secondary';button.textContent=`${likeState.liked?'♥':'♡'} 좋아요 ${likeState.like_count}`;
+        button.addEventListener('click',async()=>{try{const next=await api(`/articles/${articleId}/likes`,{method:likeState.liked?'DELETE':'POST'});renderLikeAction(container,articleId,next);button.remove()}catch(error){showToast(error.message)}});
+        container.prepend(button);
     }
 
     function openEditor(article=null){

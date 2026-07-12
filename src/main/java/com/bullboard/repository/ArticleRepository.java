@@ -39,7 +39,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Query("update Article a set a.viewCount = a.viewCount + 1 where a.id = :id")
     int increaseViewCount(@Param("id") Long id);
 
-    boolean existsByMemberId(Long memberId);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Article a set a.member = null where a.member.id = :memberId")
+    int anonymizeByMemberId(@Param("memberId") Long memberId);
 
     boolean existsByBoardId(Long boardId);
 }

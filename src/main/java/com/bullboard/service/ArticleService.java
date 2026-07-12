@@ -122,7 +122,7 @@ public class ArticleService {
     }
 
     private void validateAuthor(Article article, Long memberId) {
-        if (!article.getAuthor().getId().equals(memberId)) {
+        if (article.getAuthor() == null || !article.getAuthor().getId().equals(memberId)) {
             throw new ApiException(HttpStatus.FORBIDDEN);
         }
     }

@@ -2,6 +2,7 @@ package com.bullboard.service;
 
 import com.bullboard.repository.ArticleRepository;
 import com.bullboard.repository.MemberRepository;
+import com.bullboard.repository.CommentRepository;
 import com.bullboard.domain.Member;
 import com.bullboard.dto.LoginRequest;
 import com.bullboard.dto.MemberRequest;
@@ -19,13 +20,16 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final ArticleRepository articleRepository;
+    private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
 
     public MemberService(MemberRepository memberRepository,
                          ArticleRepository articleRepository,
+                         CommentRepository commentRepository,
                          PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.articleRepository = articleRepository;
+        this.commentRepository = commentRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -120,10 +124,8 @@ public class MemberService {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND));
 
-        if (articleRepository.existsByMemberId(id)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST);
-        }
-
+        articleRepository.anonymizeByMemberId(id);
+        commentRepository.anonymizeByMemberId(id);
         memberRepository.delete(member);
     }
 }
