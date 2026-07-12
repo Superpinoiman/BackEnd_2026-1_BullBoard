@@ -1,0 +1,13 @@
+/* 첫 화면 문구와 행동 버튼을 단순화합니다. */
+.hero h1 strong,
+.hero h1 em,
+.hero h1 .highlight {
+    color: var(--green);
+    font-family: inherit;
+    font-style: normal;
+    font-weight: inherit;
+}
+
+.hero-actions {
+    display: none;
+}
