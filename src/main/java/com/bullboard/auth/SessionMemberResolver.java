@@ -36,6 +36,7 @@ public class SessionMemberResolver {
         if (session == null) {
             return null;
         }
+
         return (Long) session.getAttribute(SessionConst.LOGIN_MEMBER_ID);
     }
 
