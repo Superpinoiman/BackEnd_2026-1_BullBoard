@@ -5,6 +5,7 @@ import com.bullboard.dto.ArticleCreateRequest;
 import com.bullboard.dto.ArticlePageResponse;
 import com.bullboard.dto.ArticleResponse;
 import com.bullboard.dto.ArticleUpdateRequest;
+import com.bullboard.dto.TrendingArticleResponse;
 import com.bullboard.service.ArticleService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/articles")
@@ -46,6 +49,12 @@ public class ArticleController {
                                                       HttpServletRequest servletRequest) {
         return ResponseEntity.ok(articleService.getArticle(
                 id, sessionMemberResolver.getMemberId(servletRequest)));
+    }
+
+    @GetMapping("/trending")
+    public ResponseEntity<List<TrendingArticleResponse>> getTrendingArticles(
+            @RequestParam(defaultValue = "3") int size) {
+        return ResponseEntity.ok(articleService.getTrendingArticles(size));
     }
 
     @GetMapping

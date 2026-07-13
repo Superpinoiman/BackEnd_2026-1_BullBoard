@@ -10,6 +10,7 @@ import com.bullboard.dto.ArticleCreateRequest;
 import com.bullboard.dto.ArticlePageResponse;
 import com.bullboard.dto.ArticleResponse;
 import com.bullboard.dto.ArticleUpdateRequest;
+import com.bullboard.dto.TrendingArticleResponse;
 import com.bullboard.exception.ApiException;
 
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -74,6 +76,12 @@ public class ArticleService {
                 .map(article -> new ArticleResponse(article, loginMemberId));
 
         return new ArticlePageResponse(responsePage);
+    }
+
+    public List<TrendingArticleResponse> getTrendingArticles(int size) {
+        int safeSize = Math.min(Math.max(size, 1), 10);
+        return articleRepository.findTrending(
+                LocalDateTime.now().minusDays(7), PageRequest.of(0, safeSize));
     }
 
     private String normalizeKeyword(String keyword) {

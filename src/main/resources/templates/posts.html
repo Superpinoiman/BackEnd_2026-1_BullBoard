@@ -176,9 +176,11 @@
             button.addEventListener('click',()=>changeBoard(board.id));boardList.append(button);
             const option=document.createElement('option');option.value=board.id;option.textContent=board.name;select.append(option);
         });
-        const query=new URLSearchParams(location.search),queryBoard=Number(query.get('boardId')),queryPage=Math.max(Number(query.get('page'))||0,0),queryKeyword=(query.get('keyword')||'').slice(0,100),querySymbol=(query.get('symbol')||'').slice(0,10).toUpperCase(),querySort=query.get('sort')==='views'?'views':'latest';
+        const query=new URLSearchParams(location.search),queryBoard=Number(query.get('boardId')),queryPage=Math.max(Number(query.get('page'))||0,0),queryKeyword=(query.get('keyword')||'').slice(0,100),querySymbol=(query.get('symbol')||'').slice(0,10).toUpperCase(),querySort=query.get('sort')==='views'?'views':'latest',queryArticleId=Number(query.get('articleId')),shouldOpenWriter=query.get('write')==='true';
         state.keyword=queryKeyword;state.symbol=querySymbol;state.sort=querySort;document.getElementById('searchInput').value=queryKeyword;document.getElementById('symbolFilter').value=querySymbol;document.getElementById('sortSelect').value=querySort;
         await selectBoard(state.boards.some(board=>board.id===queryBoard)?queryBoard:state.boards[0].id,queryPage,queryKeyword,querySymbol);
+        if(queryArticleId>0)await showDetail(queryArticleId);
+        if(shouldOpenWriter)openEditor();
     }
 
     function changeBoard(boardId){state.keyword='';state.symbol='';document.getElementById('searchInput').value='';document.getElementById('symbolFilter').value='';return selectBoard(boardId,0,'','')}

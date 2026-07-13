@@ -22,14 +22,17 @@ public class SessionMemberResolver {
 
     public Long requireMemberId(HttpServletRequest request) {
         Long memberId = getMemberId(request);
+
         if (memberId == null) {
             throw new ApiException(HttpStatus.UNAUTHORIZED);
         }
+
         return memberId;
     }
 
     public Long getMemberId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
+
         if (session == null) {
             return null;
         }
@@ -38,6 +41,7 @@ public class SessionMemberResolver {
 
     public void logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
+
         if (session != null) {
             session.invalidate();
         }

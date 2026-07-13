@@ -38,6 +38,7 @@ public class ArticleLikeController {
             @PathVariable Long articleId,
             HttpServletRequest request) {
         Long memberId = sessionMemberResolver.requireMemberId(request);
+
         return ResponseEntity.ok(articleLikeService.like(articleId, memberId));
     }
 
@@ -46,6 +47,7 @@ public class ArticleLikeController {
             @PathVariable Long articleId,
             HttpServletRequest request) {
         Long memberId = sessionMemberResolver.requireMemberId(request);
+
         return ResponseEntity.ok(articleLikeService.unlike(articleId, memberId));
     }
 }
