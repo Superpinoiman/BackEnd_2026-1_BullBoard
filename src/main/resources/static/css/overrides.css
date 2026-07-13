@@ -96,3 +96,99 @@
 .topic-grid .topic-card .topic-card-body h3{color:#12191b}
 .topic-grid .topic-card .topic-author{color:#66736f}
 .topic-grid .topic-card .topic-likes{color:#cf4f55}
+
+@media (max-width: 800px) {
+    body { overflow-x: hidden; }
+
+    .topbar {
+        height: auto;
+        min-height: 76px;
+        padding: 13px 18px 11px;
+        flex-wrap: wrap;
+        gap: 11px 12px;
+    }
+
+    .topbar .brand { order: 1; }
+    .topbar .auth-actions,
+    .topbar > #logoutButton { order: 2; margin-left: auto; }
+
+    .topbar nav {
+        order: 3;
+        display: grid;
+        width: 100%;
+        margin: 0;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .topbar nav a {
+        display: grid;
+        min-height: 39px;
+        padding: 8px 5px;
+        border-radius: 8px;
+        place-items: center;
+        font-size: 13px;
+    }
+
+    .topbar nav a:active,
+    .topbar nav a[aria-current="page"] { background: #e1f5eb; color: #087d56; }
+
+    .hero {
+        min-height: 0;
+        padding: 42px 20px 55px;
+        gap: 34px;
+    }
+
+    .hero h1 { font-size: clamp(38px, 11vw, 46px); letter-spacing: -2.5px; }
+    .hero-description { font-size: 15px; }
+    .hero-actions { align-items: stretch; flex-direction: column; }
+    .hero-actions .primary-button,
+    .hero-actions .ghost-button { width: 100%; text-align: center; }
+    .hero-panel { width: 100%; box-shadow: 10px 13px 0 #d9eee4; }
+    .nasdaq-live-chart,
+    .nasdaq-live-chart tv-mini-chart { min-height: 260px; }
+
+    .market-strip {
+        margin: 10px 20px 0;
+        grid-template-columns: 1fr;
+    }
+
+    .market-strip article,
+    .market-strip article:nth-child(2),
+    .market-strip article:nth-child(-n+2) {
+        height: 102px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .market-strip article:last-child { border-bottom: 0; }
+    .content-section,
+    .community { margin: 72px 20px; }
+    .section-title { align-items: center; gap: 15px; }
+    .section-title h2 { font-size: 24px; }
+    .market-hotlist,
+    .market-hotlist tv-market-overview { min-height: 620px; }
+    .market-hotlist { width: 100%; }
+    .topic-grid { grid-template-columns: 1fr; }
+    .topic-card { min-height: 220px; }
+
+    footer:not(.topic-grid footer) {
+        padding: 26px 20px;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal { max-height: calc(100dvh - 28px); padding: 27px 22px; }
+}
+
+@media (max-width: 430px) {
+    .topbar .auth-actions { gap: 7px; }
+    .topbar .auth-actions .text-button { padding: 7px 4px; }
+    .topbar .auth-actions .primary-button.small { padding: 9px 10px; }
+    .welcome { max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .section-title { align-items: flex-start; flex-direction: column; }
+    .community-link { align-self: flex-end; }
+}

@@ -14,6 +14,9 @@
         .topbar { height:76px; display:flex; align-items:center; justify-content:space-between; max-width:1180px; margin:auto; border-bottom:1px solid var(--line); }
         .brand { color:var(--ink); text-decoration:none; font-size:20px; font-weight:800; }
         .brand-mark { display:inline-grid; place-items:center; width:27px; height:27px; margin-right:7px; border-radius:8px; background:var(--green); color:#fff; font:italic 700 18px Georgia,serif; }
+        .page-nav { display:flex; align-items:center; gap:26px; margin-left:auto; }
+        .page-nav a { color:var(--muted); text-decoration:none; font-size:14px; font-weight:700; }
+        .page-nav a[aria-current="page"] { color:var(--green); }
         .home-link { color:var(--muted); text-decoration:none; font-size:14px; font-weight:700; }
         .layout { max-width:1180px; margin:44px auto 80px; display:grid; grid-template-columns:230px 1fr; gap:34px; }
         .sidebar,.content { background:#fff; border:1px solid var(--line); border-radius:14px; }
@@ -72,13 +75,15 @@
         .editor-actions { display:flex; justify-content:flex-end; gap:8px; }
         .toast { position:fixed; left:50%; bottom:25px; opacity:0; transform:translate(-50%,20px); padding:12px 17px; border-radius:8px; background:#172424; color:#fff; font-size:13px; transition:.2s; pointer-events:none; z-index:30; }
         .toast.show { opacity:1; transform:translate(-50%,0); }
-        @media(max-width:760px){ .topbar{padding:0 20px}.layout{margin:25px 20px;grid-template-columns:1fr}.sidebar{overflow:auto}.board-list{display:flex}.board-button{white-space:nowrap}.content{padding:21px}.article-row{grid-template-columns:1fr}.article-date{display:none} }
+        @media(max-width:760px){
+            body{overflow-x:hidden}.topbar{height:auto;min-height:76px;padding:13px 18px 11px;flex-wrap:wrap;gap:11px}.topbar .brand{order:1}.page-nav{order:3;display:grid;width:100%;margin:0;padding-top:10px;border-top:1px solid var(--line);grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.page-nav a{display:grid;min-height:39px;padding:8px 5px;border-radius:8px;place-items:center;font-size:13px}.page-nav a[aria-current="page"],.page-nav a:active{background:#e1f5eb;color:#087d56}.layout{margin:25px 16px 65px;grid-template-columns:minmax(0,1fr);gap:18px}.sidebar{padding:16px;overflow:hidden}.board-list{display:flex;max-width:100%;padding-bottom:4px;overflow-x:auto}.board-button{width:auto;min-width:max-content;white-space:nowrap}.content{min-width:0;padding:18px}.content-head{align-items:center}.search-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}.search-form input,.search-form .symbol-filter{width:100%;min-width:0;grid-column:1/-1}.search-form select,.search-form button{width:100%}.article-row{grid-template-columns:minmax(0,1fr);gap:8px}.article-date{display:none}.modal{width:100%;max-height:calc(100dvh - 24px);padding:24px 18px}.detail-title{font-size:23px}.detail-content{min-height:130px}.detail-actions{flex-wrap:wrap}.comment-form{flex-direction:column}.comment-form .primary{align-self:flex-end}.editor textarea{min-height:170px}.pagination{max-width:100%;overflow-x:auto;justify-content:flex-start}.page-button{flex:0 0 auto}
+        }
     </style>
 </head>
 <body>
 <header class="topbar">
     <a class="brand" href="/"><span class="brand-mark">B</span>BullBoard</a>
-    <a class="home-link" href="/">홈으로</a>
+    <nav class="page-nav" aria-label="주요 메뉴"><a href="/#markets">시장</a><a href="/mypage">내 페이지</a><a href="/posts" aria-current="page">커뮤니티</a></nav>
 </header>
 
 <main class="layout">
