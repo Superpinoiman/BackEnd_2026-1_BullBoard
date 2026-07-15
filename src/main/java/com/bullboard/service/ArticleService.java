@@ -60,6 +60,7 @@ public class ArticleService {
         int safeSize = Math.min(Math.max(size, 1), 100);
         String safeKeyword = normalizeKeyword(keyword);
         String safeSymbol = normalizeSymbol(symbol);
+
         Sort pageSort = "views".equalsIgnoreCase(sort)
                 ? Sort.by(Sort.Order.desc("viewCount"), Sort.Order.desc("id"))
                 : Sort.by(Sort.Order.desc("id"));
@@ -80,6 +81,7 @@ public class ArticleService {
 
     public List<TrendingArticleResponse> getTrendingArticles(int size) {
         int safeSize = Math.min(Math.max(size, 1), 10);
+
         return articleRepository.findTrending(
                 LocalDateTime.now().minusDays(7), PageRequest.of(0, safeSize));
     }

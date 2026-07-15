@@ -78,10 +78,6 @@ public class Article {
         return board;
     }
 
-    public void setBoard(Board board) {
-        this.board = board;
-    }
-
     @JsonIgnore
     public Member getAuthor() {
         return member;

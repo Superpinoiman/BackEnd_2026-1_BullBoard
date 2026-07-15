@@ -12,8 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Transactional(readOnly = true)
 public class MemberService {
@@ -74,10 +72,6 @@ public class MemberService {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND));
         return member;
-    }
-
-    public List<Member> getMembers() {
-        return memberRepository.findAll();
     }
 
     @Transactional

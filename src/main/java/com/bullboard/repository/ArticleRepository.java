@@ -14,29 +14,6 @@ import java.time.LocalDateTime;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
-    List<Article> findByBoardIdOrderByIdDesc(Long boardId);
-
-    Page<Article> findByBoardId(Long boardId, Pageable pageable);
-
-    @Query("""
-            select a from Article a
-            where a.board.id = :boardId
-              and (
-                  lower(a.title) like lower(concat('%', :keyword, '%'))
-                  or lower(a.content) like lower(concat('%', :keyword, '%'))
-              )
-            """)
-    Page<Article> searchByBoardId(@Param("boardId") Long boardId,
-                                  @Param("keyword") String keyword,
-                                  Pageable pageable);
-
-    @Query("""
-            select a from Article a
-            where lower(a.title) like lower(concat('%', :keyword, '%'))
-               or lower(a.content) like lower(concat('%', :keyword, '%'))
-            """)
-    Page<Article> searchAll(@Param("keyword") String keyword, Pageable pageable);
-
     @Query("""
             select a from Article a
             where (:boardId is null or a.board.id = :boardId)
@@ -71,5 +48,4 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Query("update Article a set a.member = null where a.member.id = :memberId")
     int anonymizeByMemberId(@Param("memberId") Long memberId);
 
-    boolean existsByBoardId(Long boardId);
 }

@@ -27,10 +27,6 @@ public class Board {
         this.name = name;
     }
 
-    public void update(String name) {
-        this.name = name;
-    }
-
     public Long getId() {
         return id;
     }
@@ -39,13 +35,4 @@ public class Board {
         return name;
     }
 
-    public void addArticle(Article article) {
-        articles.add(article);
-        article.setBoard(this);
-    }
-
-    public void removeArticle(Article article) {
-        articles.remove(article);
-        article.setBoard(null);
-    }
 }
