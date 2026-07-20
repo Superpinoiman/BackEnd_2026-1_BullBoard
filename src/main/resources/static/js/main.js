@@ -66,14 +66,10 @@ async function loadFearGreed(){
         fearGreedElements.previousMonth.textContent=formatFearGreedScore(data.previous_month);
         fearGreedElements.needle.style.transform=`rotate(${(score*1.8)-180}deg)`;
 
-        const updatedAt=new Date(data.updated_at);
-        const updatedText=Number.isNaN(updatedAt.getTime())
-            ?'최근 데이터'
-            :updatedAt.toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
         fearGreedElements.status.classList.remove('error');
         fearGreedElements.status.textContent=data.stale
-            ?`${updatedText} 기준 · 제공처 연결 지연으로 마지막 값을 표시합니다.`
-            :`${updatedText} 기준 · 5분마다 갱신됩니다.`;
+            ?'제공처 연결 지연으로 마지막 값을 표시합니다.'
+            :'';
     }catch(error){
         fearGreedElements.rating.textContent='일시적으로 확인할 수 없음';
         fearGreedElements.status.classList.add('error');

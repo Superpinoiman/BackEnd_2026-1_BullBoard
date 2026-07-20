@@ -300,6 +300,10 @@
     color: #b9444c;
 }
 
+.market-data-status:empty {
+    display: none;
+}
+
 .market-data-source {
     color: #087d56;
     font-size: 10px;
