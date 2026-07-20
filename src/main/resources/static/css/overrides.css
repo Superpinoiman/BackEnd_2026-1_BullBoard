@@ -110,12 +110,11 @@
 
 .market-dashboard-grid {
     display: grid;
-    grid-template-columns: minmax(300px, .72fr) minmax(0, 1.55fr);
+    grid-template-columns: minmax(300px, 420px);
     gap: 18px;
 }
 
-.fear-greed-card,
-.sector-heatmap-card {
+.fear-greed-card {
     min-width: 0;
     padding: 24px;
     border: 1px solid var(--line);
@@ -138,14 +137,12 @@
 }
 
 .market-card-kicker,
-.market-card-note,
 .market-live-badge {
     font: 600 10px 'DM Mono', monospace;
     letter-spacing: .7px;
 }
 
-.market-card-kicker,
-.market-card-note {
+.market-card-kicker {
     color: var(--muted);
 }
 
@@ -311,30 +308,6 @@
     text-decoration: none;
 }
 
-.sector-heatmap-card {
-    display: flex;
-    flex-direction: column;
-}
-
-.sector-heatmap {
-    width: 100%;
-    min-height: 470px;
-    margin-top: 20px;
-    overflow: hidden;
-    border-radius: 10px;
-}
-
-.sector-heatmap .tradingview-widget-container,
-.sector-heatmap .tradingview-widget-container__widget {
-    width: 100%;
-    height: 450px;
-}
-
-.sector-heatmap .tradingview-widget-copyright {
-    height: 20px;
-    padding: 4px 2px 0;
-    text-align: left;
-}
 .topic-card{display:flex;min-height:245px;padding:24px;overflow:hidden;background:linear-gradient(145deg,#f2f7f4,#e3eee8);border:1px solid #d6e5dd;border-radius:16px;position:relative;color:inherit;text-decoration:none;flex-direction:column;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.topic-card:before{content:'';position:absolute;right:-38px;top:-52px;width:145px;height:145px;border-radius:50%;background:#12a97412}.topic-card:nth-child(2){background:linear-gradient(145deg,#eef8f2,#d8f0e3)}.topic-card:nth-child(3){background:linear-gradient(145deg,#faf6ec,#eee5d1);border-color:#e6dcc4}.topic-card:hover{transform:translateY(-5px);border-color:#9fd4bb;box-shadow:0 16px 32px #17242417}.topic-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative}.board-badge{display:inline-flex;align-items:center;min-height:27px;padding:5px 10px;border:1px solid #12a97435;border-radius:999px;background:#fff9;color:#087d56;font-size:11px;font-weight:800}.topic-rank{color:#83908c;font:500 10px 'DM Mono',monospace;letter-spacing:1px}.topic-card-body{margin-top:31px;position:relative}.topic-symbol{display:inline-block;margin-bottom:9px;color:var(--green);font:600 11px 'DM Mono',monospace;letter-spacing:.5px}.topic-card .topic-card-body h3{display:-webkit-box;overflow:hidden;margin:0;font-size:20px;line-height:1.45;letter-spacing:-.8px;-webkit-box-orient:vertical;-webkit-line-clamp:2}.topic-card footer{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:24px;color:#70817b;font:11px 'DM Mono',monospace}.topic-author{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.topic-likes{color:#d55358}.topic-arrow{display:grid;place-items:center;width:30px;height:30px;margin-left:auto;border-radius:50%;background:#172424;color:#fff;font:16px Manrope,Arial,sans-serif;transition:transform .2s ease,background .2s ease}.topic-card:hover .topic-arrow{transform:translateX(3px);background:var(--green)}.community-empty{grid-column:1/-1;padding:55px 20px;border:1px dashed var(--line);border-radius:13px;color:var(--muted);text-align:center}
 .community-link{display:inline-block;text-decoration:none}.community-link:hover{color:var(--green)}
 .topic-card footer{position:static;bottom:auto}
@@ -428,11 +401,7 @@
     .market-strip article:last-child { border-bottom: 0; }
     .market-dashboard { margin: 72px 20px 0; }
     .market-dashboard-grid { grid-template-columns: minmax(0, 1fr); }
-    .fear-greed-card,
-    .sector-heatmap-card { padding: 20px; }
-    .sector-heatmap { min-height: 500px; }
-    .sector-heatmap .tradingview-widget-container,
-    .sector-heatmap .tradingview-widget-container__widget { height: 480px; }
+    .fear-greed-card { padding: 20px; }
     .content-section,
     .community { margin: 72px 20px; }
     .section-title { align-items: center; gap: 15px; }
@@ -472,5 +441,4 @@
     .section-title { align-items: flex-start; flex-direction: column; }
     .community-link { align-self: flex-end; }
     .market-card-head { align-items: flex-start; }
-    .market-card-note { max-width: 110px; text-align: right; }
 }
