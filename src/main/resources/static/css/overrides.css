@@ -98,6 +98,239 @@
 .tradingview-widget-copyright a {
     color: var(--green);
 }
+
+.market-dashboard {
+    max-width: 1200px;
+    margin: 110px auto 0;
+}
+
+.market-dashboard-title {
+    margin-bottom: 30px;
+}
+
+.market-dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(300px, .72fr) minmax(0, 1.55fr);
+    gap: 18px;
+}
+
+.fear-greed-card,
+.sector-heatmap-card {
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 14px 35px rgba(23, 36, 36, .06);
+}
+
+.market-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.market-card-head h3 {
+    margin: 5px 0 0;
+    font-size: 20px;
+    letter-spacing: -.8px;
+}
+
+.market-card-kicker,
+.market-card-note,
+.market-live-badge {
+    font: 600 10px 'DM Mono', monospace;
+    letter-spacing: .7px;
+}
+
+.market-card-kicker,
+.market-card-note {
+    color: var(--muted);
+}
+
+.market-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: #e2f7ec;
+    color: #087d56;
+}
+
+.market-live-badge:before {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    content: '';
+}
+
+.fear-greed-gauge {
+    width: min(100%, 270px);
+    aspect-ratio: 2 / 1;
+    margin: 30px auto 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.fear-greed-arc {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: conic-gradient(
+            from 270deg,
+            #d94c57 0deg 45deg,
+            #ec8658 45deg 81deg,
+            #e5bd55 81deg 99deg,
+            #75bb78 99deg 135deg,
+            #18a875 135deg 180deg,
+            #edf1ef 180deg 360deg
+    );
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+}
+
+.fear-greed-arc:after {
+    width: 63%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #fff;
+    content: '';
+    position: absolute;
+    left: 18.5%;
+    top: 18.5%;
+}
+
+.fear-greed-needle {
+    width: 32.5%;
+    height: 4px;
+    border-radius: 4px;
+    background: #172424;
+    box-shadow: 0 2px 5px rgba(23, 36, 36, .22);
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    z-index: 2;
+    transform: rotate(-90deg);
+    transform-origin: 0 50%;
+    transition: transform .7s cubic-bezier(.2, .75, .25, 1);
+}
+
+.fear-greed-hub {
+    width: 15px;
+    height: 15px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: #172424;
+    box-shadow: 0 2px 7px rgba(23, 36, 36, .2);
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    z-index: 3;
+    transform: translateX(-50%);
+}
+
+.fear-greed-current {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 11px;
+    margin-top: 12px;
+}
+
+.fear-greed-current strong {
+    font: 700 38px 'DM Mono', monospace;
+}
+
+.fear-greed-current span {
+    color: #455154;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.fear-greed-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    color: #84908d;
+    font-size: 9px;
+}
+
+.fear-greed-history {
+    display: grid;
+    margin: 24px 0 0;
+    border: 1px solid #e4e9e7;
+    border-radius: 10px;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.fear-greed-history div {
+    padding: 11px 5px;
+    border-right: 1px solid #e4e9e7;
+    text-align: center;
+}
+
+.fear-greed-history div:last-child {
+    border-right: 0;
+}
+
+.fear-greed-history dt {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.fear-greed-history dd {
+    margin: 4px 0 0;
+    font: 600 13px 'DM Mono', monospace;
+}
+
+.market-data-status {
+    min-height: 30px;
+    margin: 13px 0 5px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.market-data-status.error {
+    color: #b9444c;
+}
+
+.market-data-source {
+    color: #087d56;
+    font-size: 10px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.sector-heatmap-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.sector-heatmap {
+    width: 100%;
+    min-height: 470px;
+    margin-top: 20px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.sector-heatmap .tradingview-widget-container,
+.sector-heatmap .tradingview-widget-container__widget {
+    width: 100%;
+    height: 450px;
+}
+
+.sector-heatmap .tradingview-widget-copyright {
+    height: 20px;
+    padding: 4px 2px 0;
+    text-align: left;
+}
 .topic-card{display:flex;min-height:245px;padding:24px;overflow:hidden;background:linear-gradient(145deg,#f2f7f4,#e3eee8);border:1px solid #d6e5dd;border-radius:16px;position:relative;color:inherit;text-decoration:none;flex-direction:column;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.topic-card:before{content:'';position:absolute;right:-38px;top:-52px;width:145px;height:145px;border-radius:50%;background:#12a97412}.topic-card:nth-child(2){background:linear-gradient(145deg,#eef8f2,#d8f0e3)}.topic-card:nth-child(3){background:linear-gradient(145deg,#faf6ec,#eee5d1);border-color:#e6dcc4}.topic-card:hover{transform:translateY(-5px);border-color:#9fd4bb;box-shadow:0 16px 32px #17242417}.topic-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative}.board-badge{display:inline-flex;align-items:center;min-height:27px;padding:5px 10px;border:1px solid #12a97435;border-radius:999px;background:#fff9;color:#087d56;font-size:11px;font-weight:800}.topic-rank{color:#83908c;font:500 10px 'DM Mono',monospace;letter-spacing:1px}.topic-card-body{margin-top:31px;position:relative}.topic-symbol{display:inline-block;margin-bottom:9px;color:var(--green);font:600 11px 'DM Mono',monospace;letter-spacing:.5px}.topic-card .topic-card-body h3{display:-webkit-box;overflow:hidden;margin:0;font-size:20px;line-height:1.45;letter-spacing:-.8px;-webkit-box-orient:vertical;-webkit-line-clamp:2}.topic-card footer{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:24px;color:#70817b;font:11px 'DM Mono',monospace}.topic-author{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.topic-likes{color:#d55358}.topic-arrow{display:grid;place-items:center;width:30px;height:30px;margin-left:auto;border-radius:50%;background:#172424;color:#fff;font:16px Manrope,Arial,sans-serif;transition:transform .2s ease,background .2s ease}.topic-card:hover .topic-arrow{transform:translateX(3px);background:var(--green)}.community-empty{grid-column:1/-1;padding:55px 20px;border:1px dashed var(--line);border-radius:13px;color:var(--muted);text-align:center}
 .community-link{display:inline-block;text-decoration:none}.community-link:hover{color:var(--green)}
 .topic-card footer{position:static;bottom:auto}
@@ -189,6 +422,13 @@
     }
 
     .market-strip article:last-child { border-bottom: 0; }
+    .market-dashboard { margin: 72px 20px 0; }
+    .market-dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+    .fear-greed-card,
+    .sector-heatmap-card { padding: 20px; }
+    .sector-heatmap { min-height: 500px; }
+    .sector-heatmap .tradingview-widget-container,
+    .sector-heatmap .tradingview-widget-container__widget { height: 480px; }
     .content-section,
     .community { margin: 72px 20px; }
     .section-title { align-items: center; gap: 15px; }
@@ -209,6 +449,17 @@
     .modal { max-height: calc(100dvh - 28px); padding: 27px 22px; }
 }
 
+.welcome {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.welcome:hover {
+    color: var(--green);
+}
+
 @media (max-width: 430px) {
     .topbar .auth-actions { gap: 7px; }
     .topbar .auth-actions .text-button { padding: 7px 4px; }
@@ -216,4 +467,6 @@
     .welcome { max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .section-title { align-items: flex-start; flex-direction: column; }
     .community-link { align-self: flex-end; }
+    .market-card-head { align-items: flex-start; }
+    .market-card-note { max-width: 110px; text-align: right; }
 }
