@@ -137,7 +137,7 @@
         <label>게시판<select id="editorBoard" required></select></label>
         <label>종목 심볼 (선택)<input id="editorSymbol" maxlength="10" placeholder="예: NVDA, AAPL"></label>
         <label>제목<input id="editorArticleTitle" maxlength="200" required placeholder="제목을 입력하세요"></label>
-        <label>내용<textarea id="editorContent" required placeholder="내용을 입력하세요"></textarea></label>
+        <label>내용<textarea id="editorContent" maxlength="10000" required placeholder="내용을 입력하세요 (최대 10,000자)"></textarea></label>
         <div class="editor-actions">
             <button class="secondary" type="button" data-close="editorOverlay">취소</button>
             <button class="primary" type="submit">저장</button>

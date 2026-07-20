@@ -27,8 +27,13 @@ public class Article {
     @JoinColumn(name = "author_id", nullable = true)
     private Member member;
 
+    @Column(nullable = false, length = 200)
     private String title;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
+
+    @Column(length = 10)
     private String symbol;
 
     @Column(nullable = false)
