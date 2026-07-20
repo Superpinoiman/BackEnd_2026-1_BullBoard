@@ -6,6 +6,7 @@ import com.bullboard.repository.CommentRepository;
 import com.bullboard.domain.Member;
 import com.bullboard.dto.LoginRequest;
 import com.bullboard.dto.MemberRequest;
+import com.bullboard.dto.MemberUpdateRequest;
 import com.bullboard.exception.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -75,24 +76,39 @@ public class MemberService {
     }
 
     @Transactional
-    public Member updateMember(Long id, MemberRequest request) {
-        validatePasswordConfirm(request);
-
+    public Member updateMember(Long id, MemberUpdateRequest request) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND));
 
-        Member foundMember = memberRepository.findByEmail(request.getEmail());
+        String normalizedEmail = request.getEmail().trim();
+        String normalizedNickname = request.getNickname().trim();
+
+        Member foundMember = memberRepository.findByEmail(normalizedEmail);
         if (foundMember != null && !foundMember.getId().equals(id)) {
             throw new ApiException(HttpStatus.CONFLICT);
         }
 
-        Member foundNickname = memberRepository.findByNickname(request.getNickname());
+        Member foundNickname = memberRepository.findByNickname(normalizedNickname);
         if (foundNickname != null && !foundNickname.getId().equals(id)) {
             throw new ApiException(HttpStatus.CONFLICT);
         }
 
-        member.update(request.getNickname(), request.getEmail(),
-                passwordEncoder.encode(request.getPassword()));
+        String introduction = request.getIntroduction() == null
+                ? "" : request.getIntroduction().trim();
+        member.updateProfile(
+                normalizedNickname,
+                normalizedEmail,
+                introduction
+        );
+
+        String newPassword = request.getPassword() == null
+                ? "" : request.getPassword();
+        if (!newPassword.isBlank()) {
+            if (!newPassword.equals(request.getPasswordConfirm())) {
+                throw new ApiException(HttpStatus.BAD_REQUEST);
+            }
+            member.changePassword(passwordEncoder.encode(newPassword));
+        }
         return member;
     }
 

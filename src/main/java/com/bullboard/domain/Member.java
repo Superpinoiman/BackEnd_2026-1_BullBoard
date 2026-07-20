@@ -25,6 +25,10 @@ public class Member {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(length = 200)
+    private String introduction;
+
     private String password;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -36,13 +40,14 @@ public class Member {
     public Member(String nickname, String email, String password) {
         this.nickname = nickname;
         this.email = email;
+        this.introduction = "";
         this.password = password;
     }
 
-    public void update(String nickname, String email, String password) {
+    public void updateProfile(String nickname, String email, String introduction) {
         this.nickname = nickname;
         this.email = email;
-        this.password = password;
+        this.introduction = introduction;
     }
 
     public void changePassword(String password) {
@@ -63,5 +68,9 @@ public class Member {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getIntroduction() {
+        return introduction == null ? "" : introduction;
     }
 }

@@ -29,6 +29,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
                          @Param("symbol") String symbol,
                          Pageable pageable);
 
+    Page<Article> findByMemberId(Long memberId, Pageable pageable);
+
     @Query("""
             select new com.bullboard.dto.TrendingArticleResponse(a, count(articleLike))
             from Article a

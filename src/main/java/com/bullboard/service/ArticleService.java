@@ -83,6 +83,17 @@ public class ArticleService {
         return new ArticlePageResponse(responsePage);
     }
 
+    public ArticlePageResponse getMyArticles(Long memberId, int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        Pageable pageable = PageRequest.of(
+                safePage, safeSize, Sort.by(Sort.Order.desc("id")));
+        Page<ArticleResponse> responsePage = articleRepository
+                .findByMemberId(memberId, pageable)
+                .map(article -> new ArticleResponse(article, memberId));
+        return new ArticlePageResponse(responsePage);
+    }
+
     public List<TrendingArticleResponse> getTrendingArticles(int size) {
         int safeSize = Math.min(Math.max(size, 1), 10);
 
