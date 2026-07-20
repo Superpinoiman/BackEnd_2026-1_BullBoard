@@ -6,9 +6,8 @@
     <title>BullBoard | 미국 주식 커뮤니티</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/overrides.css?v=10">
+    <link rel="stylesheet" href="/css/overrides.css?v=11">
     <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-single-ticker.js"></script>
-    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-mini-chart.js"></script>
     <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-market-overview.js"></script>
 </head>
 <body>
@@ -33,9 +32,12 @@
             </div>
             <p class="notice">BullBoard는 투자 조언을 제공하지 않습니다.</p>
         </div>
-        <div class="hero-panel">
-            <div class="panel-head"><span>오늘의 나스닥 시장</span><span class="live-dot">LIVE</span></div>
-            <div class="nasdaq-live-chart"><tv-mini-chart symbol="FOREXCOM:NSXUSD" theme="dark" transparent><span class="ticker-placeholder">나스닥 100 차트 불러오는 중…</span></tv-mini-chart></div>
+        <div class="hero-panel hero-brand-panel">
+            <img class="hero-brand-logo" src="/favicon.svg" alt="BullBoard B 로고">
+            <p class="hero-brand-kicker">US STOCK COMMUNITY</p>
+            <h2>BullBoard</h2>
+            <p>시장의 흐름을 읽고<br>투자자의 관점을 연결합니다.</p>
+            <span class="hero-brand-line" aria-hidden="true"></span>
         </div>
     </section>
 
@@ -50,7 +52,7 @@
         <div class="section-title market-dashboard-title">
             <div>
                 <p class="eyebrow">MARKET SENTIMENT</p>
-                <h2 id="marketDashboardTitle">오늘의 시장 심리</h2>
+                <h2 id="marketDashboardTitle">시장 심리와 나스닥</h2>
             </div>
         </div>
         <div class="market-dashboard-grid">
@@ -85,6 +87,42 @@
                 <a class="market-data-source" href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener nofollow">CNN Fear &amp; Greed Index →</a>
             </article>
 
+            <article class="nasdaq-candle-card">
+                <div class="market-card-head">
+                    <div>
+                        <span class="market-card-kicker">NASDAQ 100</span>
+                        <h3>나스닥 캔들 차트</h3>
+                    </div>
+                    <span class="market-delay-badge">지연 데이터</span>
+                </div>
+                <div class="nasdaq-candle-chart">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <div class="tradingview-widget-copyright">
+                            <a href="https://www.tradingview.com/symbols/NASDAQ-NDX/" rel="noopener nofollow" target="_blank">NASDAQ 100 chart</a>
+                            <span> by TradingView</span>
+                        </div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                        {
+                          "autosize": true,
+                          "symbol": "FOREXCOM:NSXUSD",
+                          "interval": "30",
+                          "timezone": "Asia/Seoul",
+                          "theme": "light",
+                          "style": "1",
+                          "locale": "kr",
+                          "backgroundColor": "rgba(255, 255, 255, 1)",
+                          "gridColor": "rgba(230, 235, 233, 1)",
+                          "allow_symbol_change": false,
+                          "calendar": false,
+                          "hide_side_toolbar": true,
+                          "save_image": false,
+                          "support_host": "https://www.tradingview.com"
+                        }
+                        </script>
+                    </div>
+                </div>
+            </article>
         </div>
     </section>
 
