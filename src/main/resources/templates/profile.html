@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 프로필 | BullBoard</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/overrides.css?v=8">
+    <link rel="stylesheet" href="/css/profile.css?v=1">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="/"><span class="brand-mark">B</span> BullBoard</a>
+    <nav>
+        <a href="/#markets">시장</a>
+        <a href="/mypage">내 페이지</a>
+        <a href="/posts">커뮤니티</a>
+    </nav>
+</header>
+
+<main class="profile-shell">
+    <section class="profile-state" id="loadingState">
+        <p>회원 정보를 불러오고 있습니다.</p>
+    </section>
+
+    <section class="profile-state" id="notFoundState" hidden>
+        <p class="eyebrow">PROFILE</p>
+        <h1>회원을 찾을 수 없습니다</h1>
+        <p>탈퇴했거나 존재하지 않는 회원입니다.</p>
+        <a href="/posts">커뮤니티로 돌아가기</a>
+    </section>
+
+    <div id="profileContent" hidden>
+        <section class="public-profile">
+            <div class="profile-avatar" id="profileInitial">B</div>
+            <div>
+                <p class="eyebrow">BULLBOARD MEMBER</p>
+                <h1 id="profileNickname"></h1>
+                <p class="profile-introduction" id="profileIntroduction"></p>
+            </div>
+        </section>
+
+        <section class="profile-articles">
+            <div class="section-head">
+                <div>
+                    <p class="eyebrow">POSTS</p>
+                    <h2>작성한 게시글</h2>
+                </div>
+                <span id="articleCount">0개</span>
+            </div>
+            <div class="profile-article-list" id="articleList"></div>
+            <nav class="profile-pagination" id="pagination"
+                 aria-label="작성한 게시글 페이지"></nav>
+        </section>
+    </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<script src="/js/profile.js?v=1"></script>
+</body>
+</html>

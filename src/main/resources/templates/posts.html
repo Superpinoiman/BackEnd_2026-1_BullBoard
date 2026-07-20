@@ -52,6 +52,8 @@
         .close { position:absolute; right:15px; top:12px; border:0; background:transparent; color:var(--muted); font-size:27px; }
         .detail-title { margin:7px 35px 10px 0; font-size:26px; }
         .detail-meta { padding-bottom:18px; border-bottom:1px solid var(--line); color:var(--muted); font-size:13px; }
+        .detail-author { color:#087d56; font-weight:800; text-decoration:none; }
+        .detail-author:hover { text-decoration:underline; }
         .detail-images { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding-top:20px; }
         .detail-images:empty { display:none; }
         .detail-images img { width:100%; max-height:420px; border-radius:10px; background:var(--paper); object-fit:contain; }
@@ -256,7 +258,7 @@
         document.getElementById('detailBoard').textContent=article.symbol?`${article.board_name} · ${article.symbol}`:article.board_name;
         document.getElementById('detailTitle').textContent=article.title;
         renderDetailImages(article.images||[]);
-        document.getElementById('detailMeta').textContent=`${article.author_nickname} · 조회 ${article.view_count} · ${formatDate(article.created_date)}`;
+        renderDetailMeta(article);
         document.getElementById('detailContent').textContent=article.content;
         const actions=document.getElementById('detailActions');actions.replaceChildren();
         const likeState=await api(`/articles/${article.id}/likes`);renderLikeAction(actions,article.id,likeState);
@@ -276,6 +278,24 @@
             element.src=image.url;element.alt=image.original_name;element.loading='lazy';
             container.append(element);
         });
+    }
+
+    function renderDetailMeta(article){
+        const meta=document.getElementById('detailMeta');meta.replaceChildren();
+        if(article.author_id){
+            const author=document.createElement('a');
+            author.className='detail-author';
+            author.href=`/profile/${article.author_id}`;
+            author.textContent=article.author_nickname;
+            meta.append(author);
+        }else{
+            const author=document.createElement('span');
+            author.textContent=article.author_nickname;
+            meta.append(author);
+        }
+        meta.append(document.createTextNode(
+                ` · 조회 ${article.view_count} · ${formatDate(article.created_date)}`
+        ));
     }
 
     async function loadComments(articleId){

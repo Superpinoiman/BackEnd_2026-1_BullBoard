@@ -84,13 +84,22 @@ public class ArticleService {
     }
 
     public ArticlePageResponse getMyArticles(Long memberId, int page, int size) {
+        return getMemberArticles(memberId, page, size, memberId);
+    }
+
+    public ArticlePageResponse getPublicArticles(Long memberId, int page, int size) {
+        return getMemberArticles(memberId, page, size, null);
+    }
+
+    private ArticlePageResponse getMemberArticles(Long memberId, int page, int size,
+                                                   Long loginMemberId) {
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), 50);
         Pageable pageable = PageRequest.of(
                 safePage, safeSize, Sort.by(Sort.Order.desc("id")));
         Page<ArticleResponse> responsePage = articleRepository
                 .findByMemberId(memberId, pageable)
-                .map(article -> new ArticleResponse(article, memberId));
+                .map(article -> new ArticleResponse(article, loginMemberId));
         return new ArticlePageResponse(responsePage);
     }
 

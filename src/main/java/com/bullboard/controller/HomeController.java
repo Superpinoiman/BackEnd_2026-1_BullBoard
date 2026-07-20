@@ -15,4 +15,9 @@ public class HomeController {
     public String myPage() {
         return "mypage";
     }
+
+    @GetMapping("/profile/{memberId}")
+    public String publicProfile() {
+        return "profile";
+    }
 }
