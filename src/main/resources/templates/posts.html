@@ -65,6 +65,8 @@
         .comment-list { display:grid; gap:10px; }
         .comment { padding:13px; border-radius:9px; background:var(--paper); }
         .comment-head { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:12px; }
+        .comment-author { color:#087d56; font-weight:800; text-decoration:none; }
+        .comment-author:hover { text-decoration:underline; }
         .comment-content { margin:9px 0 0; line-height:1.55; white-space:pre-wrap; }
         .comment-actions { display:flex; justify-content:flex-end; gap:6px; margin-top:8px; }
         .comment-actions button { border:0; background:transparent; color:var(--muted); font-size:12px; font-weight:700; }
@@ -306,7 +308,9 @@
         state.comments.forEach(comment=>{
             const item=document.createElement('article');item.className='comment';
             const head=document.createElement('div');head.className='comment-head';
-            const author=document.createElement('strong');author.textContent=comment.author_nickname;
+            const author=document.createElement(comment.author_id?'a':'strong');
+            author.textContent=comment.author_nickname;
+            if(comment.author_id){author.className='comment-author';author.href=`/profile/${comment.author_id}`}
             const date=document.createElement('span');date.textContent=formatDate(comment.created_date);head.append(author,date);
             const content=document.createElement('p');content.className='comment-content';content.textContent=comment.content;
             item.append(head,content);
