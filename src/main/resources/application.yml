@@ -8,3 +8,10 @@ spring:
     hibernate:
       ddl-auto: update
 
+app:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET:}
+      region: ${AWS_REGION:ap-northeast-2}
+      upload-expiration-minutes: 5
+

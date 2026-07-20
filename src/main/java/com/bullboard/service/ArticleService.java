@@ -31,13 +31,16 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final ArticleImageService articleImageService;
 
     public ArticleService(ArticleRepository articleRepository,
                           BoardRepository boardRepository,
-                          MemberRepository memberRepository) {
+                          MemberRepository memberRepository,
+                          ArticleImageService articleImageService) {
         this.articleRepository = articleRepository;
         this.boardRepository = boardRepository;
         this.memberRepository = memberRepository;
+        this.articleImageService = articleImageService;
     }
 
     @Transactional
@@ -49,7 +52,8 @@ public class ArticleService {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND));
 
-        return new ArticleResponse(article, loginMemberId);
+        return new ArticleResponse(article, loginMemberId,
+                articleImageService.getResponses(article.getId()));
     }
 
     public ArticlePageResponse getArticles(Long boardId, String keyword, String symbol,
@@ -119,7 +123,9 @@ public class ArticleService {
                 request.getTitle(), request.getContent());
         articleRepository.save(article);
 
-        return new ArticleResponse(article, memberId);
+        return new ArticleResponse(article, memberId,
+                articleImageService.attachImages(
+                        article, memberId, request.getImageKeys()));
     }
 
     @Transactional
@@ -134,7 +140,9 @@ public class ArticleService {
 
         article.update(board, normalizeSymbol(request.getSymbol()),
                 request.getTitle(), request.getContent());
-        return new ArticleResponse(article, memberId);
+        return new ArticleResponse(article, memberId,
+                articleImageService.attachImages(
+                        article, memberId, request.getImageKeys()));
     }
 
     @Transactional
@@ -142,6 +150,7 @@ public class ArticleService {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND));
         validateAuthor(article, memberId);
+        articleImageService.deleteArticleImagesAfterCommit(article.getId());
         articleRepository.delete(article);
     }
 

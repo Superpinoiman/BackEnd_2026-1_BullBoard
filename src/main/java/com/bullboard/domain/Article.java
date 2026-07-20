@@ -51,6 +51,9 @@ public class Article {
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArticleLike> likes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ArticleImage> images = new ArrayList<>();
+
     protected Article() {
     }
 

@@ -3,6 +3,7 @@ package com.bullboard.dto;
 import com.bullboard.domain.Article;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ArticleResponse {
 
@@ -18,8 +19,14 @@ public class ArticleResponse {
     private final LocalDateTime createdDate;
     private final LocalDateTime modifiedDate;
     private final boolean editable;
+    private final List<ArticleImageResponse> images;
 
     public ArticleResponse(Article article, Long loginMemberId) {
+        this(article, loginMemberId, List.of());
+    }
+
+    public ArticleResponse(Article article, Long loginMemberId,
+                           List<ArticleImageResponse> images) {
         this.id = article.getId();
         this.boardId = article.getBoard().getId();
         this.boardName = article.getBoard().getName();
@@ -34,6 +41,7 @@ public class ArticleResponse {
         this.modifiedDate = article.getModifiedDate();
         this.editable = authorId != null && loginMemberId != null
                 && loginMemberId.equals(authorId);
+        this.images = List.copyOf(images);
     }
 
     public Long getId() { return id; }
@@ -48,4 +56,5 @@ public class ArticleResponse {
     public LocalDateTime getCreatedDate() { return createdDate; }
     public LocalDateTime getModifiedDate() { return modifiedDate; }
     public boolean isEditable() { return editable; }
+    public List<ArticleImageResponse> getImages() { return images; }
 }

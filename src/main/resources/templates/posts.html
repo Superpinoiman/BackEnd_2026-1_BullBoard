@@ -52,6 +52,10 @@
         .close { position:absolute; right:15px; top:12px; border:0; background:transparent; color:var(--muted); font-size:27px; }
         .detail-title { margin:7px 35px 10px 0; font-size:26px; }
         .detail-meta { padding-bottom:18px; border-bottom:1px solid var(--line); color:var(--muted); font-size:13px; }
+        .detail-images { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding-top:20px; }
+        .detail-images:empty { display:none; }
+        .detail-images img { width:100%; max-height:420px; border-radius:10px; background:var(--paper); object-fit:contain; }
+        .detail-images img:only-child { grid-column:1/-1; }
         .detail-content { min-height:190px; padding:24px 0; line-height:1.75; white-space:pre-wrap; }
         .detail-actions { display:flex; justify-content:flex-end; gap:8px; }
         .comments { margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
@@ -72,11 +76,21 @@
         .editor label { display:grid; gap:7px; font-size:12px; font-weight:800; }
         .editor input,.editor textarea,.editor select { padding:12px; border:1px solid var(--line); border-radius:8px; background:#fff; }
         .editor textarea { min-height:220px; resize:vertical; }
+        .image-help { color:var(--muted); font-size:12px; font-weight:400; }
+        .image-preview { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+        .image-preview:empty { display:none; }
+        .image-preview-item { position:relative; overflow:hidden; aspect-ratio:1; border:1px solid var(--line); border-radius:9px; background:var(--paper); }
+        .image-preview-item img { width:100%; height:100%; object-fit:cover; }
+        .image-preview-item button { position:absolute; right:5px; top:5px; width:27px; height:27px; padding:0; border:0; border-radius:50%; background:#172424d9; color:#fff; font-weight:800; }
         .editor-actions { display:flex; justify-content:flex-end; gap:8px; }
         .toast { position:fixed; left:50%; bottom:25px; opacity:0; transform:translate(-50%,20px); padding:12px 17px; border-radius:8px; background:#172424; color:#fff; font-size:13px; transition:.2s; pointer-events:none; z-index:30; }
         .toast.show { opacity:1; transform:translate(-50%,0); }
         @media(max-width:760px){
             body{overflow-x:hidden}.topbar{height:auto;min-height:76px;padding:13px 18px 11px;flex-wrap:wrap;gap:11px}.topbar .brand{order:1}.page-nav{order:3;display:grid;width:100%;margin:0;padding-top:10px;border-top:1px solid var(--line);grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.page-nav a{display:grid;min-height:39px;padding:8px 5px;border-radius:8px;place-items:center;font-size:13px}.page-nav a[aria-current="page"],.page-nav a:active{background:#e1f5eb;color:#087d56}.layout{margin:25px 16px 65px;grid-template-columns:minmax(0,1fr);gap:18px}.sidebar{padding:16px;overflow:hidden}.board-list{display:flex;max-width:100%;padding-bottom:4px;overflow-x:auto}.board-button{width:auto;min-width:max-content;white-space:nowrap}.content{min-width:0;padding:18px}.content-head{align-items:center}.search-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}.search-form input,.search-form .symbol-filter{width:100%;min-width:0;grid-column:1/-1}.search-form select,.search-form button{width:100%}.article-row{grid-template-columns:minmax(0,1fr);gap:8px}.article-date{display:none}.modal{width:100%;max-height:calc(100dvh - 24px);padding:24px 18px}.detail-title{font-size:23px}.detail-content{min-height:130px}.detail-actions{flex-wrap:wrap}.comment-form{flex-direction:column}.comment-form .primary{align-self:flex-end}.editor textarea{min-height:170px}.pagination{max-width:100%;overflow-x:auto;justify-content:flex-start}.page-button{flex:0 0 auto}
+        }
+        @media(max-width:760px){
+            .detail-images { grid-template-columns:1fr; }
+            .detail-images img { grid-column:1; }
         }
     </style>
 </head>
@@ -117,6 +131,7 @@
         <p class="eyebrow" id="detailBoard"></p>
         <h2 class="detail-title" id="detailTitle"></h2>
         <div class="detail-meta" id="detailMeta"></div>
+        <div class="detail-images" id="detailImages"></div>
         <div class="detail-content" id="detailContent"></div>
         <div class="detail-actions" id="detailActions"></div>
         <section class="comments">
@@ -138,6 +153,11 @@
         <label>종목 심볼 (선택)<input id="editorSymbol" maxlength="10" placeholder="예: NVDA, AAPL"></label>
         <label>제목<input id="editorArticleTitle" maxlength="200" required placeholder="제목을 입력하세요"></label>
         <label>내용<textarea id="editorContent" maxlength="10000" required placeholder="내용을 입력하세요 (최대 10,000자)"></textarea></label>
+        <label>사진
+            <span class="image-help">JPG, PNG, WebP · 한 장당 5MB 이하 · 최대 3장</span>
+            <input id="editorImages" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+        </label>
+        <div class="image-preview" id="imagePreview"></div>
         <div class="editor-actions">
             <button class="secondary" type="button" data-close="editorOverlay">취소</button>
             <button class="primary" type="submit">저장</button>
@@ -148,12 +168,12 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    const state={boards:[],articles:[],comments:[],selectedBoardId:null,keyword:'',symbol:'',sort:'latest',pageInfo:null,editingId:null,currentArticle:null};
+    const state={boards:[],articles:[],comments:[],selectedBoardId:null,keyword:'',symbol:'',sort:'latest',pageInfo:null,editingId:null,currentArticle:null,pendingImages:[],existingImages:[],uploading:false,editorSession:0};
     const boardList=document.getElementById('boardList'),articleList=document.getElementById('articleList'),toast=document.getElementById('toast');
     const showToast=message=>{toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)};
     const formatDate=value=>new Intl.DateTimeFormat('ko-KR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));
     const open=id=>document.getElementById(id).classList.add('visible');
-    const close=id=>document.getElementById(id).classList.remove('visible');
+    const close=id=>{document.getElementById(id).classList.remove('visible');if(id==='editorOverlay'){state.editorSession++;discardPendingImages()}};
     document.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',()=>close(button.dataset.close)));
     document.querySelectorAll('.overlay').forEach(overlay=>overlay.addEventListener('click',event=>{if(event.target===overlay)close(overlay.id)}));
 
@@ -235,6 +255,7 @@
         const article=await api(`/articles/${id}`);state.currentArticle=article;
         document.getElementById('detailBoard').textContent=article.symbol?`${article.board_name} · ${article.symbol}`:article.board_name;
         document.getElementById('detailTitle').textContent=article.title;
+        renderDetailImages(article.images||[]);
         document.getElementById('detailMeta').textContent=`${article.author_nickname} · 조회 ${article.view_count} · ${formatDate(article.created_date)}`;
         document.getElementById('detailContent').textContent=article.content;
         const actions=document.getElementById('detailActions');actions.replaceChildren();
@@ -246,6 +267,15 @@
         }
         await loadComments(article.id);
         open('detailOverlay');
+    }
+
+    function renderDetailImages(images){
+        const container=document.getElementById('detailImages');container.replaceChildren();
+        images.forEach(image=>{
+            const element=document.createElement('img');
+            element.src=image.url;element.alt=image.original_name;element.loading='lazy';
+            container.append(element);
+        });
     }
 
     async function loadComments(articleId){
@@ -291,22 +321,116 @@
         container.prepend(button);
     }
 
+    function clearPendingImages(){
+        state.pendingImages.forEach(image=>URL.revokeObjectURL(image.previewUrl));
+        state.pendingImages=[];
+    }
+
+    function discardPendingImages(){
+        const pending=[...state.pendingImages];
+        clearPendingImages();
+        pending.forEach(image=>api(
+                `/article-images/uploads?objectKey=${encodeURIComponent(image.objectKey)}`,
+                {method:'DELETE'}
+        ).catch(()=>{}));
+        const preview=document.getElementById('imagePreview');
+        if(preview)renderImagePreview();
+    }
+
+    function renderImagePreview(){
+        const preview=document.getElementById('imagePreview');preview.replaceChildren();
+        state.existingImages.forEach(image=>preview.append(createPreviewItem(
+                image.url,image.original_name,async()=>{
+                    if(!confirm('이 사진을 삭제하시겠습니까?'))return;
+                    try{
+                        await api(`/article-images/${image.id}`,{method:'DELETE'});
+                        state.existingImages=state.existingImages.filter(item=>item.id!==image.id);
+                        renderImagePreview();
+                    }catch(error){showToast(error.message)}
+                }
+        )));
+        state.pendingImages.forEach(image=>preview.append(createPreviewItem(
+                image.previewUrl,image.file.name,async()=>{
+                    try{
+                        await api(`/article-images/uploads?objectKey=${encodeURIComponent(image.objectKey)}`,{method:'DELETE'});
+                        URL.revokeObjectURL(image.previewUrl);
+                        state.pendingImages=state.pendingImages.filter(item=>item!==image);
+                        renderImagePreview();
+                    }catch(error){showToast(error.message)}
+                }
+        )));
+    }
+
+    function createPreviewItem(src,alt,onRemove){
+        const item=document.createElement('div');item.className='image-preview-item';
+        const image=document.createElement('img');image.src=src;image.alt=alt;
+        const remove=document.createElement('button');remove.type='button';remove.textContent='×';
+        remove.setAttribute('aria-label','사진 삭제');remove.addEventListener('click',onRemove);
+        item.append(image,remove);return item;
+    }
+
+    document.getElementById('editorImages').addEventListener('change',async event=>{
+        const files=[...event.target.files];event.target.value='';
+        const editorSession=state.editorSession;
+        if(state.existingImages.length+state.pendingImages.length+files.length>3){
+            showToast('사진은 최대 3장까지 등록할 수 있습니다.');return;
+        }
+        state.uploading=true;
+        try{
+            for(const file of files){
+                if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size<1||file.size>5*1024*1024){
+                    throw new Error('JPG, PNG, WebP 파일만 장당 5MB까지 등록할 수 있습니다.');
+                }
+                const upload=await api('/article-images/presigned-url',{
+                    method:'POST',
+                    body:JSON.stringify({
+                        original_file_name:file.name,
+                        content_type:file.type,
+                        file_size:file.size
+                    })
+                });
+                const response=await fetch(upload.upload_url,{
+                    method:'PUT',headers:upload.headers,body:file
+                });
+                if(!response.ok)throw new Error('사진 업로드에 실패했습니다.');
+                if(editorSession!==state.editorSession){
+                    await api(`/article-images/uploads?objectKey=${encodeURIComponent(upload.object_key)}`,{method:'DELETE'});
+                    continue;
+                }
+                state.pendingImages.push({
+                    objectKey:upload.object_key,
+                    previewUrl:URL.createObjectURL(file),
+                    file
+                });
+                renderImagePreview();
+            }
+        }catch(error){showToast(error.message)}
+        finally{state.uploading=false}
+    });
+
     function openEditor(article=null){
+        clearPendingImages();
+        state.editorSession++;
         state.editingId=article?.id||null;
+        state.existingImages=[...(article?.images||[])];
         document.getElementById('editorTitle').textContent=article?'게시글 수정':'게시글 작성';
         document.getElementById('editorBoard').value=article?.board_id||state.selectedBoardId;
         document.getElementById('editorSymbol').value=article?.symbol||'';
         document.getElementById('editorArticleTitle').value=article?.title||'';
         document.getElementById('editorContent').value=article?.content||'';
+        document.getElementById('editorImages').value='';
+        renderImagePreview();
         close('detailOverlay');open('editorOverlay');
     }
 
     document.getElementById('writeButton').addEventListener('click',()=>openEditor());
     document.getElementById('editorForm').addEventListener('submit',async event=>{
         event.preventDefault();
-        const body=JSON.stringify({board_id:Number(document.getElementById('editorBoard').value),symbol:document.getElementById('editorSymbol').value.trim().toUpperCase(),title:document.getElementById('editorArticleTitle').value.trim(),content:document.getElementById('editorContent').value.trim()});
+        if(state.uploading){showToast('사진 업로드가 끝날 때까지 잠시 기다려 주세요.');return}
+        const body=JSON.stringify({board_id:Number(document.getElementById('editorBoard').value),symbol:document.getElementById('editorSymbol').value.trim().toUpperCase(),title:document.getElementById('editorArticleTitle').value.trim(),content:document.getElementById('editorContent').value.trim(),image_keys:state.pendingImages.map(image=>image.objectKey)});
         try{
             const article=await api(state.editingId?`/articles/${state.editingId}`:'/articles',{method:state.editingId?'PUT':'POST',body});
+            clearPendingImages();
             close('editorOverlay');showToast(state.editingId?'게시글이 수정되었습니다.':'게시글이 작성되었습니다.');
             await selectBoard(article.board_id,0);await showDetail(article.id);
         }catch(error){showToast(error.message)}

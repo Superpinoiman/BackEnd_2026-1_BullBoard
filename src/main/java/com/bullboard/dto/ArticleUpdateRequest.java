@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ArticleUpdateRequest {
 
     @NotNull
@@ -24,6 +27,9 @@ public class ArticleUpdateRequest {
     @Size(max = 10000)
     private String content;
 
+    @Size(max = 3)
+    private List<String> imageKeys = new ArrayList<>();
+
     public Long getBoardId() {
         return boardId;
     }
@@ -35,5 +41,8 @@ public class ArticleUpdateRequest {
     }
     public String getContent() {
         return content;
+    }
+    public List<String> getImageKeys() {
+        return imageKeys;
     }
 }
