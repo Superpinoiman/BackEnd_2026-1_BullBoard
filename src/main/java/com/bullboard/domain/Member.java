@@ -44,10 +44,13 @@ public class Member {
         this.password = password;
     }
 
-    public void updateProfile(String nickname, String email, String introduction) {
+    public void updateProfile(String nickname, String introduction) {
         this.nickname = nickname;
-        this.email = email;
         this.introduction = introduction;
+    }
+
+    public void changeEmail(String email) {
+        this.email = email;
     }
 
     public void changePassword(String password) {

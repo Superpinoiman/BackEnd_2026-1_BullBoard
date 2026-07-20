@@ -287,7 +287,7 @@
         if(article.author_id){
             const author=document.createElement('a');
             author.className='detail-author';
-            author.href=`/profile/${article.author_id}`;
+            author.href=article.editable?'/mypage':`/profile/${article.author_id}`;
             author.textContent=article.author_nickname;
             meta.append(author);
         }else{
@@ -310,7 +310,7 @@
             const head=document.createElement('div');head.className='comment-head';
             const author=document.createElement(comment.author_id?'a':'strong');
             author.textContent=comment.author_nickname;
-            if(comment.author_id){author.className='comment-author';author.href=`/profile/${comment.author_id}`}
+            if(comment.author_id){author.className='comment-author';author.href=comment.editable?'/mypage':`/profile/${comment.author_id}`}
             const date=document.createElement('span');date.textContent=formatDate(comment.created_date);head.append(author,date);
             const content=document.createElement('p');content.className='comment-content';content.textContent=comment.content;
             item.append(head,content);

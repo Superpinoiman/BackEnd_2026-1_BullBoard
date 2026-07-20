@@ -1,9 +1,12 @@
 package com.bullboard.controller;
 
 import com.bullboard.auth.SessionMemberResolver;
+import com.bullboard.dto.AccountUpdateRequest;
 import com.bullboard.dto.ArticlePageResponse;
 import com.bullboard.dto.MemberResponse;
 import com.bullboard.dto.MemberUpdateRequest;
+import com.bullboard.dto.NicknameAvailabilityResponse;
+import com.bullboard.dto.ProfileUpdateRequest;
 import com.bullboard.service.ArticleService;
 import com.bullboard.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +50,33 @@ public class MyPageController {
         Long memberId = sessionMemberResolver.requireMemberId(servletRequest);
 
         return ResponseEntity.ok(new MemberResponse(memberService.updateMember(memberId, request)));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<MemberResponse> updateProfile(
+            @Valid @RequestBody ProfileUpdateRequest request,
+            HttpServletRequest servletRequest) {
+        Long memberId = sessionMemberResolver.requireMemberId(servletRequest);
+        return ResponseEntity.ok(new MemberResponse(
+                memberService.updateProfile(memberId, request)));
+    }
+
+    @PutMapping("/account")
+    public ResponseEntity<MemberResponse> updateAccount(
+            @Valid @RequestBody AccountUpdateRequest request,
+            HttpServletRequest servletRequest) {
+        Long memberId = sessionMemberResolver.requireMemberId(servletRequest);
+        return ResponseEntity.ok(new MemberResponse(
+                memberService.updateAccount(memberId, request)));
+    }
+
+    @GetMapping("/nickname-availability")
+    public ResponseEntity<NicknameAvailabilityResponse> nicknameAvailability(
+            @RequestParam String nickname,
+            HttpServletRequest request) {
+        Long memberId = sessionMemberResolver.requireMemberId(request);
+        return ResponseEntity.ok(new NicknameAvailabilityResponse(
+                memberService.isNicknameAvailable(memberId, nickname)));
     }
 
     @GetMapping("/articles")

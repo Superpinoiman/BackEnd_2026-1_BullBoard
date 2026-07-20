@@ -2,10 +2,17 @@ const loadingState = document.getElementById('loadingState');
 const loginRequired = document.getElementById('loginRequired');
 const memberContent = document.getElementById('memberContent');
 const profileForm = document.getElementById('profileForm');
+const accountForm = document.getElementById('accountForm');
+const accountOverlay = document.getElementById('accountOverlay');
 const logoutButton = document.getElementById('logoutButton');
 const deleteMemberButton = document.getElementById('deleteMemberButton');
+const nicknameInput = document.getElementById('nickname');
+const nicknameMessage = document.getElementById('nicknameMessage');
 const introduction = document.getElementById('introduction');
 const toast = document.getElementById('toast');
+
+let currentMember = null;
+let verifiedNickname = null;
 
 function showToast(message) {
     toast.textContent = message;
@@ -56,15 +63,18 @@ async function loadProfile() {
 }
 
 function renderProfile(member) {
+    currentMember = member;
     const intro = member.introduction || '';
     document.getElementById('welcomeNickname').textContent = member.nickname;
     document.getElementById('profileInitial').textContent =
         member.nickname.trim().charAt(0).toUpperCase() || 'B';
     document.getElementById('profileIntroduction').textContent =
         intro || '소개를 작성해 나를 표현해 보세요.';
-    document.getElementById('email').value = member.email;
-    document.getElementById('nickname').value = member.nickname;
+    nicknameInput.value = member.nickname;
     introduction.value = intro;
+    document.getElementById('accountEmail').value = member.email;
+    verifiedNickname = member.nickname;
+    showNicknameMessage('현재 사용 중인 닉네임입니다.', true);
     updateIntroductionCount();
 }
 
@@ -73,12 +83,107 @@ function updateIntroductionCount() {
         introduction.value.length;
 }
 
+function showNicknameMessage(message, available) {
+    nicknameMessage.textContent = message;
+    nicknameMessage.className =
+        `verification-message ${available ? 'available' : 'unavailable'}`;
+}
+
 introduction.addEventListener('input', updateIntroductionCount);
+
+nicknameInput.addEventListener('input', () => {
+    const nickname = nicknameInput.value.trim();
+    if (currentMember && nickname === currentMember.nickname) {
+        verifiedNickname = nickname;
+        showNicknameMessage('현재 사용 중인 닉네임입니다.', true);
+        return;
+    }
+    verifiedNickname = null;
+    nicknameMessage.textContent = '닉네임 중복확인이 필요합니다.';
+    nicknameMessage.className = 'verification-message';
+});
+
+document.getElementById('nicknameCheckButton').addEventListener('click', async () => {
+    const nickname = nicknameInput.value.trim();
+    if (!nickname || nickname.length > 50) {
+        verifiedNickname = null;
+        showNicknameMessage('1자 이상 50자 이하로 입력해 주세요.', false);
+        return;
+    }
+    try {
+        const result = await request(
+            `/me/nickname-availability?nickname=${encodeURIComponent(nickname)}`
+        );
+        if (result.available) {
+            verifiedNickname = nickname;
+            showNicknameMessage('사용할 수 있는 닉네임입니다.', true);
+        } else {
+            verifiedNickname = null;
+            showNicknameMessage('이미 사용 중인 닉네임입니다.', false);
+        }
+    } catch (error) {
+        verifiedNickname = null;
+        showToast('닉네임 중복확인에 실패했습니다.');
+    }
+});
 
 profileForm.addEventListener('submit', async event => {
     event.preventDefault();
-    const password = document.getElementById('password').value;
-    const passwordConfirm = document.getElementById('passwordConfirm').value;
+    const nickname = nicknameInput.value.trim();
+    if (verifiedNickname !== nickname) {
+        showToast('닉네임 중복확인을 먼저 해주세요.');
+        return;
+    }
+
+    try {
+        const member = await request('/me/profile', {
+            method: 'PUT',
+            body: JSON.stringify({
+                nickname,
+                introduction: introduction.value.trim()
+            })
+        });
+        renderProfile(member);
+        showToast('프로필이 저장되었습니다.');
+    } catch (error) {
+        if (error.status === 409) {
+            verifiedNickname = null;
+            showNicknameMessage('이미 사용 중인 닉네임입니다.', false);
+            showToast('다른 회원이 먼저 사용한 닉네임입니다.');
+            return;
+        }
+        showToast('프로필 저장에 실패했습니다.');
+    }
+});
+
+function openAccountModal() {
+    document.getElementById('accountEmail').value = currentMember.email;
+    document.getElementById('accountPassword').value = '';
+    document.getElementById('accountPasswordConfirm').value = '';
+    accountOverlay.hidden = false;
+    document.body.classList.add('modal-open');
+    document.getElementById('accountEmail').focus();
+}
+
+function closeAccountModal() {
+    accountOverlay.hidden = true;
+    document.body.classList.remove('modal-open');
+}
+
+document.getElementById('accountEditButton').addEventListener('click', openAccountModal);
+document.getElementById('accountCloseButton').addEventListener('click', closeAccountModal);
+document.getElementById('accountCancelButton').addEventListener('click', closeAccountModal);
+accountOverlay.addEventListener('click', event => {
+    if (event.target === accountOverlay) {
+        closeAccountModal();
+    }
+});
+
+accountForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const password = document.getElementById('accountPassword').value;
+    const passwordConfirm =
+        document.getElementById('accountPasswordConfirm').value;
     const passwordPattern =
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s])\S{8,}$/;
 
@@ -91,29 +196,24 @@ profileForm.addEventListener('submit', async event => {
         return;
     }
 
-    const body = {
-        email: document.getElementById('email').value.trim(),
-        nickname: document.getElementById('nickname').value.trim(),
-        introduction: introduction.value.trim(),
-        password,
-        password_confirm: passwordConfirm
-    };
-
     try {
-        const member = await request('/me', {
+        const member = await request('/me/account', {
             method: 'PUT',
-            body: JSON.stringify(body)
+            body: JSON.stringify({
+                email: document.getElementById('accountEmail').value.trim(),
+                password,
+                password_confirm: passwordConfirm
+            })
         });
-        renderProfile(member);
-        document.getElementById('password').value = '';
-        document.getElementById('passwordConfirm').value = '';
+        currentMember = member;
+        closeAccountModal();
         showToast('회원정보가 저장되었습니다.');
     } catch (error) {
         if (error.status === 409) {
-            showToast('이미 사용 중인 이메일 또는 닉네임입니다.');
+            showToast('이미 사용 중인 이메일입니다.');
             return;
         }
-        showToast('입력한 정보를 다시 확인해 주세요.');
+        showToast('회원정보 저장에 실패했습니다.');
     }
 });
 

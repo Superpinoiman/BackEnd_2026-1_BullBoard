@@ -5,8 +5,10 @@ import com.bullboard.repository.MemberRepository;
 import com.bullboard.repository.CommentRepository;
 import com.bullboard.domain.Member;
 import com.bullboard.dto.LoginRequest;
+import com.bullboard.dto.AccountUpdateRequest;
 import com.bullboard.dto.MemberRequest;
 import com.bullboard.dto.MemberUpdateRequest;
+import com.bullboard.dto.ProfileUpdateRequest;
 import com.bullboard.exception.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -83,23 +85,13 @@ public class MemberService {
         String normalizedEmail = request.getEmail().trim();
         String normalizedNickname = request.getNickname().trim();
 
-        Member foundMember = memberRepository.findByEmail(normalizedEmail);
-        if (foundMember != null && !foundMember.getId().equals(id)) {
-            throw new ApiException(HttpStatus.CONFLICT);
-        }
-
-        Member foundNickname = memberRepository.findByNickname(normalizedNickname);
-        if (foundNickname != null && !foundNickname.getId().equals(id)) {
-            throw new ApiException(HttpStatus.CONFLICT);
-        }
+        validateEmailAvailable(id, normalizedEmail);
+        validateNicknameAvailable(id, normalizedNickname);
 
         String introduction = request.getIntroduction() == null
                 ? "" : request.getIntroduction().trim();
-        member.updateProfile(
-                normalizedNickname,
-                normalizedEmail,
-                introduction
-        );
+        member.updateProfile(normalizedNickname, introduction);
+        member.changeEmail(normalizedEmail);
 
         String newPassword = request.getPassword() == null
                 ? "" : request.getPassword();
@@ -110,6 +102,60 @@ public class MemberService {
             member.changePassword(passwordEncoder.encode(newPassword));
         }
         return member;
+    }
+
+    @Transactional
+    public Member updateProfile(Long id, ProfileUpdateRequest request) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND));
+        String nickname = request.getNickname().trim();
+        validateNicknameAvailable(id, nickname);
+        String introduction = request.getIntroduction() == null
+                ? "" : request.getIntroduction().trim();
+        member.updateProfile(nickname, introduction);
+        return member;
+    }
+
+    @Transactional
+    public Member updateAccount(Long id, AccountUpdateRequest request) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND));
+        String email = request.getEmail().trim();
+        validateEmailAvailable(id, email);
+        member.changeEmail(email);
+
+        String password = request.getPassword() == null ? "" : request.getPassword();
+        String passwordConfirm = request.getPasswordConfirm() == null
+                ? "" : request.getPasswordConfirm();
+        if (!password.equals(passwordConfirm)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST);
+        }
+        if (!password.isBlank()) {
+            member.changePassword(passwordEncoder.encode(password));
+        }
+        return member;
+    }
+
+    public boolean isNicknameAvailable(Long id, String nickname) {
+        if (nickname == null || nickname.trim().isBlank()
+                || nickname.trim().length() > 50) {
+            return false;
+        }
+        Member found = memberRepository.findByNickname(nickname.trim());
+        return found == null || found.getId().equals(id);
+    }
+
+    private void validateNicknameAvailable(Long id, String nickname) {
+        if (!isNicknameAvailable(id, nickname)) {
+            throw new ApiException(HttpStatus.CONFLICT);
+        }
+    }
+
+    private void validateEmailAvailable(Long id, String email) {
+        Member found = memberRepository.findByEmail(email);
+        if (found != null && !found.getId().equals(id)) {
+            throw new ApiException(HttpStatus.CONFLICT);
+        }
     }
 
     private boolean matchesPassword(String rawPassword, String storedPassword) {

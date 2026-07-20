@@ -61,11 +61,25 @@
     letter-spacing: -1px;
 }
 
+.profile-hero-copy {
+    min-width: 0;
+}
+
 .profile-hero #profileIntroduction {
     margin: 8px 0 0;
     color: var(--muted);
     line-height: 1.6;
     white-space: pre-wrap;
+}
+
+.account-button {
+    margin-left: auto;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 800;
 }
 
 .mypage-grid {
@@ -124,6 +138,37 @@
     padding-bottom: 30px;
     line-height: 1.6;
     resize: vertical;
+}
+
+.nickname-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.nickname-row button {
+    padding: 0 14px;
+    border: 1px solid #a9dcca;
+    border-radius: 9px;
+    background: #e5f7ef;
+    color: #087d56;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.verification-message {
+    min-height: 16px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.verification-message.available {
+    color: #087d56;
+}
+
+.verification-message.unavailable {
+    color: #d34e4a;
 }
 
 .profile-card input:focus,
@@ -262,6 +307,96 @@
     font-weight: 800;
 }
 
+.account-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(10, 24, 20, .68);
+}
+
+.account-modal {
+    position: relative;
+    width: min(100%, 490px);
+    max-height: calc(100dvh - 40px);
+    overflow: auto;
+    padding: 32px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .2);
+}
+
+.account-modal h2 {
+    margin: 0;
+    font-size: 25px;
+}
+
+.modal-description {
+    margin: 10px 30px 24px 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.modal-close {
+    position: absolute;
+    top: 13px;
+    right: 15px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 28px;
+}
+
+.account-modal form {
+    display: grid;
+    gap: 17px;
+}
+
+.account-modal label {
+    display: grid;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.account-modal input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    color: var(--ink);
+    font: 14px Manrope, Arial, sans-serif;
+    outline: none;
+}
+
+.account-modal input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(18, 169, 116, .11);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.secondary-button {
+    padding: 11px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 800;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
 [hidden] {
     display: none !important;
 }
@@ -285,6 +420,10 @@ nav a[aria-current="page"] {
         padding: 24px 20px;
     }
 
+    .profile-hero {
+        flex-wrap: wrap;
+    }
+
     .profile-hero h1 {
         font-size: 25px;
     }
@@ -296,5 +435,14 @@ nav a[aria-current="page"] {
 
     .danger-button {
         width: 100%;
+    }
+
+    .account-button {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .account-modal {
+        padding: 27px 20px;
     }
 }
